@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK Design Guidelines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #F4F2EF;
+      --surface: #FFFFFF;
+      --border:  rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.13);
+      --text:    #1A1A1A;
+      --text2:   #666;
+      --text3:   #AAA;
+      --accent:  #FF5D3D;
+      --navy:    #1a2340;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); font-size:13px; line-height:1.6; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background:var(--navy); color:white;
+      padding:0 40px; height:52px;
+      display:flex; align-items:center; justify-content:space-between;
+      position:sticky; top:0; z-index:100;
+    }
+    .topbar-logo { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; }
+    .topbar-logo span { color:#FF5D3D; }
+    .topbar-label { font-size:12px; color:rgba(255,255,255,0.4); letter-spacing:1px; }
+
+    /* ── LAYOUT ── */
+    .wrap { max-width:960px; margin:0 auto; padding:48px 24px 80px; }
+
+    /* ── PAGE TITLE ── */
+    .page-title {
+      margin-bottom:48px;
+      border-bottom:2px solid var(--border2);
+      padding-bottom:24px;
+    }
+    .page-title h1 { font-family:'Inter',sans-serif; font-size:32px; font-weight:800; color:var(--text); margin-bottom:6px; }
+    .page-title h1 span { color:var(--accent); }
+    .page-title p { font-size:14px; color:var(--text2); }
+
+    /* ── SECTION ── */
+    .section { margin-bottom:52px; }
+    .section-title {
+      font-family:'Inter',sans-serif;
+      font-size:11px; font-weight:700;
+      color:var(--text3); letter-spacing:2px;
+      text-transform:uppercase;
+      margin-bottom:20px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-title::after { content:''; flex:1; height:1px; background:var(--border2); }
+
+    /* ── CARD ── */
+    .g-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:14px; padding:24px; margin-bottom:12px;
+    }
+    .g-card-title { font-size:12px; font-weight:700; color:var(--text2); margin-bottom:16px; }
+
+    /* ── COLOR ── */
+    .color-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+    .color-item { }
+    .color-swatch {
+      height:64px; border-radius:10px; margin-bottom:8px;
+      border:1px solid rgba(0,0,0,0.06);
+      position:relative;
+    }
+    .color-swatch.border { border:2px dashed #DDD; }
+    .color-name { font-size:12px; font-weight:700; color:var(--text); margin-bottom:2px; }
+    .color-hex { font-family:'Inter',sans-serif; font-size:11px; color:var(--text3); }
+    .color-note { font-size:10px; color:var(--text3); margin-top:2px; }
+
+    .color-group-label {
+      font-size:10px; font-weight:700; color:var(--text3);
+      text-transform:uppercase; letter-spacing:1.5px;
+      margin:20px 0 10px;
+    }
+    .color-group-label:first-child { margin-top:0; }
+
+    /* ── TYPOGRAPHY ── */
+    .type-row {
+      display:flex; align-items:baseline; gap:20px;
+      padding:14px 0; border-bottom:1px solid var(--border);
+    }
+    .type-row:last-child { border-bottom:none; }
+    .type-meta { width:200px; flex-shrink:0; }
+    .type-label { font-size:11px; font-weight:700; color:var(--text3); margin-bottom:2px; }
+    .type-spec { font-family:'Inter',sans-serif; font-size:11px; color:var(--text2); }
+    .type-sample { flex:1; }
+
+    /* ── RADIUS ── */
+    .radius-grid { display:flex; gap:16px; flex-wrap:wrap; align-items:flex-end; }
+    .radius-item { text-align:center; }
+    .radius-box {
+      background:var(--navy);
+      margin:0 auto 8px;
+      opacity:0.85;
+    }
+    .radius-val { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; color:var(--text); margin-bottom:2px; }
+    .radius-use { font-size:10px; color:var(--text3); }
+
+    /* ── SPACING ── */
+    .spacing-list { display:flex; flex-direction:column; gap:10px; }
+    .spacing-row { display:flex; align-items:center; gap:16px; }
+    .spacing-bar { background:var(--accent); height:10px; border-radius:3px; opacity:0.7; }
+    .spacing-label { font-family:'Inter',sans-serif; font-size:12px; font-weight:700; color:var(--text); width:40px; }
+    .spacing-use { font-size:12px; color:var(--text2); }
+
+    /* ── SHADOW ── */
+    .shadow-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+    .shadow-box {
+      background:white; border-radius:12px; padding:20px;
+      text-align:center;
+    }
+    .shadow-name { font-size:12px; font-weight:700; color:var(--text); margin-bottom:4px; }
+    .shadow-val { font-family:'Inter',sans-serif; font-size:10px; color:var(--text3); line-height:1.4; }
+
+    /* ── BUTTONS ── */
+    .btn-grid { display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
+    .btn {
+      display:inline-flex; align-items:center; gap:6px;
+      padding:10px 20px; border-radius:10px; font-size:13px; font-weight:700;
+      font-family:inherit; cursor:pointer; border:none; transition:all 0.15s;
+      white-space:nowrap;
+    }
+    .btn-primary { background:var(--accent); color:white; box-shadow:0 4px 14px rgba(255,93,61,0.3); }
+    .btn-secondary { background:var(--navy); color:white; }
+    .btn-ghost { background:none; border:1.5px solid var(--border2); color:var(--text2); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+    .btn-sm { padding:6px 14px; font-size:12px; border-radius:8px; }
+    .btn-lg { padding:14px 32px; font-size:15px; border-radius:12px; }
+    .btn-pill { border-radius:24px; }
+
+    /* ── BADGES ── */
+    .badge-grid { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .bdg {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 12px; border-radius:20px;
+      font-size:11px; font-weight:700;
+    }
+    .bdg-dot { width:6px; height:6px; border-radius:50%; }
+
+    /* ── TAGS ── */
+    .tag-grid { display:flex; gap:6px; flex-wrap:wrap; }
+    .tag {
+      padding:4px 12px; border-radius:6px;
+      font-size:11px; font-weight:500;
+    }
+    .tag-outline { border:1.5px solid var(--border2); color:var(--text2); }
+    .tag-accent { border:1.5px solid rgba(255,93,61,0.4); background:rgba(255,93,61,0.06); color:var(--accent); }
+    .tag-filled { background:var(--bg); color:var(--text2); border:1px solid var(--border); }
+    .tag-navy { background:rgba(26,35,64,0.08); color:var(--navy); }
+
+    /* ── INPUTS ── */
+    .input-grid { display:flex; flex-direction:column; gap:10px; }
+    .finput, .fselect, .ftextarea {
+      width:100%; padding:10px 14px;
+      background:var(--bg); border:1.5px solid var(--border2);
+      border-radius:10px; font-size:13px; font-family:inherit;
+      color:var(--text); outline:none; transition:border-color 0.15s;
+    }
+    .finput:focus, .fselect:focus { border-color:var(--accent); background:white; }
+    .finput.error { border-color:#FF5252; background:rgba(255,82,82,0.03); }
+    .finput.success { border-color:#1DB954; background:rgba(29,185,84,0.03); }
+
+    /* ── AVATAR ── */
+    .avatar-grid { display:flex; gap:12px; align-items:flex-end; }
+    .av {
+      border-radius:50%; background:var(--navy);
+      display:flex; align-items:center; justify-content:center;
+      color:white; font-weight:700; font-family:'Inter',sans-serif;
+      flex-shrink:0;
+    }
+    .av-label { text-align:center; margin-top:6px; font-size:10px; color:var(--text3); }
+
+    /* ── CARD TYPES ── */
+    .card-showcase { display:grid; grid-template-columns:1fr 1fr 1fr; gap:14px; }
+
+    /* ── DO / DONT ── */
+    .do-dont { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+    .do-box, .dont-box {
+      border-radius:12px; padding:18px; border:2px solid;
+    }
+    .do-box { border-color:rgba(29,185,84,0.3); background:rgba(29,185,84,0.04); }
+    .dont-box { border-color:rgba(255,82,82,0.3); background:rgba(255,82,82,0.04); }
+    .do-label { font-size:11px; font-weight:700; color:#1DB954; margin-bottom:10px; }
+    .dont-label { font-size:11px; font-weight:700; color:#FF5252; margin-bottom:10px; }
+    .do-content, .dont-content { font-size:12px; color:var(--text2); line-height:1.7; }
+
+    /* ── STRIPE ── */
+    .stripe-demo { display:flex; gap:8px; }
+    .stripe {
+      width:5px; border-radius:3px;
+      flex-shrink:0;
+    }
+    .stripe-card { background:white; border:1px solid var(--border); border-radius:10px; padding:12px 14px; flex:1; font-size:12px; color:var(--text2); }
+  </style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-logo">P<span>A</span>RK</div>
+  <div class="topbar-label">DESIGN GUIDELINES v1.0</div>
+</div>
+
+<div class="wrap">
+
+  <div class="page-title">
+    <h1>PARK <span>Design</span> Guidelines</h1>
+    <p>プロトタイプ群に共通するデザインの仕様・ルール・コンポーネント一覧</p>
+  </div>
+
+  <!-- ────────────────────────────────
+       1. COLOR
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">01 / Color Palette</div>
+
+    <div class="g-card">
+      <div class="color-group-label">Brand — オリジナルスクショより抽出</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FF5D3D;"></div>
+          <div class="color-name">Primary</div>
+          <div class="color-hex">#FF5D3D</div>
+          <div class="color-note">ボタン・アクセント</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#C9430E;"></div>
+          <div class="color-name">Primary Dark</div>
+          <div class="color-hex">#C9430E</div>
+          <div class="color-note">ホバー時</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FFF0EB; border:1px solid #eee;"></div>
+          <div class="color-name">Primary Light</div>
+          <div class="color-hex">#FFF0EB</div>
+          <div class="color-note">選択背景・タグ背景</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#1a2340;"></div>
+          <div class="color-name">Navy</div>
+          <div class="color-hex">#1A2340</div>
+          <div class="color-note">ヘッダー・ヒーロー</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#243060;"></div>
+          <div class="color-name">Navy Light</div>
+          <div class="color-hex">#243060</div>
+          <div class="color-note">グラデーション終端</div>
+        </div>
+      </div>
+
+      <div class="color-group-label" style="margin-top:24px;">Neutral — 追加定義</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:#1A1A1A;"></div>
+          <div class="color-name">Text</div>
+          <div class="color-hex">#1A1A1A</div>
+          <div class="color-note">本文・見出し</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#666666;"></div>
+          <div class="color-name">Text 2</div>
+          <div class="color-hex">#666666</div>
+          <div class="color-note">サブテキスト</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#AAAAAA;"></div>
+          <div class="color-name">Text 3</div>
+          <div class="color-hex">#AAAAAA</div>
+          <div class="color-note">プレースホルダー・日付</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#F4F2EF; border:1px solid #DDD;"></div>
+          <div class="color-name">Background</div>
+          <div class="color-hex">#F4F2EF</div>
+          <div class="color-note">ページ背景（クリーム）</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FFFFFF; border:1px solid #DDD;"></div>
+          <div class="color-name">Surface</div>
+          <div class="color-hex">#FFFFFF</div>
+          <div class="color-note">カード・入力欄</div>
+        </div>
+      </div>
+
+      <div class="color-group-label" style="margin-top:24px;">Status — 追加定義</div>
+      <div class="color-grid">
+        <div class="color-item">
+          <div class="color-swatch" style="background:#1DB954;"></div>
+          <div class="color-name">Success / 確定</div>
+          <div class="color-hex">#1DB954</div>
+          <div class="color-note">確定・完了・マッチ度</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#7C4DFF;"></div>
+          <div class="color-name">Purple / 面談</div>
+          <div class="color-hex">#7C4DFF</div>
+          <div class="color-note">面談調整中</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#2196F3;"></div>
+          <div class="color-name">Blue / 応募済</div>
+          <div class="color-hex">#2196F3</div>
+          <div class="color-note">応募済み</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FF5252;"></div>
+          <div class="color-name">Error / 急募</div>
+          <div class="color-hex">#FF5252</div>
+          <div class="color-note">急募・エラー</div>
+        </div>
+        <div class="color-item">
+          <div class="color-swatch" style="background:#FF9100;"></div>
+          <div class="color-name">Warning / 人気</div>
+          <div class="color-hex">#FF9100</div>
+          <div class="color-note">人気・警告</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────
+       2. TYPOGRAPHY
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">02 / Typography</div>
+
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">フォントファミリー</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+        <div>
+          <div style="font-family:'Inter',sans-serif; font-size:28px; font-weight:800; margin-bottom:6px;">Inter</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px;">見出し・数値・ロゴ・英語テキスト</div>
+          <div style="font-family:'Inter',sans-serif; font-size:13px; color:var(--text2);">Weights: 600 / 700 / 800</div>
+        </div>
+        <div>
+          <div style="font-family:'Noto Sans JP',sans-serif; font-size:28px; font-weight:700; margin-bottom:6px;">Noto Sans JP</div>
+          <div style="font-size:12px; color:var(--text2); margin-bottom:10px;">本文・ラベル・日本語テキスト全般</div>
+          <div style="font-family:'Inter',sans-serif; font-size:13px; color:var(--text2);">Weights: 400 / 500 / 700</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="g-card">
+      <div class="g-card-title">タイポグラフィスケール</div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Display</div>
+          <div class="type-spec">Inter 800 / 32px</div>
+        </div>
+        <div class="type-sample" style="font-family:'Inter',sans-serif; font-size:32px; font-weight:800; line-height:1.2;">PARK Design</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Heading 1</div>
+          <div class="type-spec">Inter 800 / 22–24px</div>
+        </div>
+        <div class="type-sample" style="font-family:'Inter',sans-serif; font-size:22px; font-weight:800; line-height:1.3;">おかえり、花子さん。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Heading 2</div>
+          <div class="type-spec">Noto Sans JP 700 / 16–18px</div>
+        </div>
+        <div class="type-sample" style="font-size:18px; font-weight:700;">UIデザイナー（週3〜、フルリモート可）</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Card Title</div>
+          <div class="type-spec">Noto Sans JP 700 / 14–15px</div>
+        </div>
+        <div class="type-sample" style="font-size:15px; font-weight:700;">求人業種の設定</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Body</div>
+          <div class="type-spec">Noto Sans JP 400 / 13px / lh 1.7–1.9</div>
+        </div>
+        <div class="type-sample" style="font-size:13px; line-height:1.8; color:var(--text2);">自社プロダクトのUI/UXデザインを担当していただきます。エンジニアやPMと密に連携しながら、ユーザーリサーチから画面設計まで幅広くお任せします。</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Label / Meta</div>
+          <div class="type-spec">Noto Sans JP 700 / 11–12px</div>
+        </div>
+        <div class="type-sample" style="font-size:12px; font-weight:700; color:var(--text2);">稼働日数 ・ 応募締切 ・ 公開日</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Caption / Section</div>
+          <div class="type-spec">Noto Sans JP 700 / 10–11px / uppercase</div>
+        </div>
+        <div class="type-sample" style="font-size:10px; font-weight:700; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase;">STATUS • DEADLINE • CATEGORY</div>
+      </div>
+      <div class="type-row">
+        <div class="type-meta">
+          <div class="type-label">Stat / Number</div>
+          <div class="type-spec">Inter 800 / 26–28px</div>
+        </div>
+        <div class="type-sample" style="font-family:'Inter',sans-serif; font-size:28px; font-weight:800;">248<span style="font-size:14px; color:var(--accent);">件</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────
+       3. SPACING & RADIUS
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">03 / Spacing & Border Radius</div>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+      <div class="g-card">
+        <div class="g-card-title">スペーシング</div>
+        <div class="spacing-list">
+          <div class="spacing-row"><div class="spacing-label">4px</div><div class="spacing-bar" style="width:4px;"></div><div class="spacing-use">要素内の微細な余白</div></div>
+          <div class="spacing-row"><div class="spacing-label">6px</div><div class="spacing-bar" style="width:6px;"></div><div class="spacing-use">タグ間・アイコン横</div></div>
+          <div class="spacing-row"><div class="spacing-label">8px</div><div class="spacing-bar" style="width:8px;"></div><div class="spacing-use">チップ・バッジ内</div></div>
+          <div class="spacing-row"><div class="spacing-label">10px</div><div class="spacing-bar" style="width:10px;"></div><div class="spacing-use">リスト行間・小ボタン</div></div>
+          <div class="spacing-row"><div class="spacing-label">14px</div><div class="spacing-bar" style="width:14px;"></div><div class="spacing-use">カード間・グリッドギャップ</div></div>
+          <div class="spacing-row"><div class="spacing-label">16px</div><div class="spacing-bar" style="width:16px;"></div><div class="spacing-use">カード内パディング（小）</div></div>
+          <div class="spacing-row"><div class="spacing-label">20px</div><div class="spacing-bar" style="width:20px;"></div><div class="spacing-use">セクション間</div></div>
+          <div class="spacing-row"><div class="spacing-label">24px</div><div class="spacing-bar" style="width:24px;"></div><div class="spacing-use">ページパディング・カード内（大）</div></div>
+          <div class="spacing-row"><div class="spacing-label">28px</div><div class="spacing-bar" style="width:28px;"></div><div class="spacing-use">ヒーローパディング</div></div>
+          <div class="spacing-row"><div class="spacing-label">48px</div><div class="spacing-bar" style="width:48px;"></div><div class="spacing-use">ページトップ余白</div></div>
+        </div>
+      </div>
+
+      <div class="g-card">
+        <div class="g-card-title">ボーダーラジウス</div>
+        <div class="radius-grid">
+          <div class="radius-item">
+            <div class="radius-box" style="width:32px; height:32px; border-radius:4px;"></div>
+            <div class="radius-val">4px</div>
+            <div class="radius-use">小バッジ</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:36px; height:36px; border-radius:6px;"></div>
+            <div class="radius-val">6px</div>
+            <div class="radius-use">タグ・ラベル</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:40px; height:40px; border-radius:8px;"></div>
+            <div class="radius-val">8px</div>
+            <div class="radius-use">小ボタン・チップ</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:44px; height:44px; border-radius:10px;"></div>
+            <div class="radius-val">10px</div>
+            <div class="radius-use">入力欄・中ボタン</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:48px; height:48px; border-radius:12px;"></div>
+            <div class="radius-val">12px</div>
+            <div class="radius-use">大ボタン・サブカード</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:52px; height:52px; border-radius:14px;"></div>
+            <div class="radius-val">14px</div>
+            <div class="radius-use">メインカード</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:56px; height:56px; border-radius:16px;"></div>
+            <div class="radius-val">16px</div>
+            <div class="radius-use">ヒーロー・大カード</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:36px; height:36px; border-radius:50%;"></div>
+            <div class="radius-val">50%</div>
+            <div class="radius-use">アバター・ドット</div>
+          </div>
+          <div class="radius-item">
+            <div class="radius-box" style="width:64px; height:32px; border-radius:24px;"></div>
+            <div class="radius-val">24px</div>
+            <div class="radius-use">ピル・丸ボタン</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────
+       4. ELEVATION / SHADOW
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">04 / Elevation & Shadow</div>
+    <div class="shadow-grid">
+      <div class="shadow-box" style="box-shadow:none; border:1px solid var(--border);">
+        <div class="shadow-name">Flat</div>
+        <div class="shadow-val">border: 1px solid rgba(0,0,0,0.07)<br>shadow: none</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">通常のカード・入力欄</div>
+      </div>
+      <div class="shadow-box" style="box-shadow:0 4px 16px rgba(0,0,0,0.06);">
+        <div class="shadow-name">Raised</div>
+        <div class="shadow-val">0 4px 16px rgba(0,0,0,0.06)</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">ホバー時・フォーカス</div>
+      </div>
+      <div class="shadow-box" style="box-shadow:0 8px 32px rgba(0,0,0,0.10);">
+        <div class="shadow-name">Float</div>
+        <div class="shadow-val">0 8px 32px rgba(0,0,0,0.10)</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">モーダル・ドロップダウン</div>
+      </div>
+      <div class="shadow-box" style="box-shadow:0 4px 14px rgba(255,93,61,0.3);">
+        <div class="shadow-name">Accent Glow</div>
+        <div class="shadow-val">0 4px 14px rgba(255,93,61,0.30)</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">Primaryボタン</div>
+      </div>
+      <div class="shadow-box" style="box-shadow:0 0 0 3px rgba(255,93,61,0.2);">
+        <div class="shadow-name">Focus Ring</div>
+        <div class="shadow-val">0 0 0 3px rgba(255,93,61,0.20)</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">フォーカス状態</div>
+      </div>
+      <div class="shadow-box" style="background:rgba(255,255,255,0.9); backdrop-filter:blur(16px); box-shadow:none; border:1px solid var(--border);">
+        <div class="shadow-name">Blur / Frosted</div>
+        <div class="shadow-val">backdrop-filter: blur(16px)<br>bg: rgba(255,255,255,0.9)</div>
+        <div style="margin-top:8px; font-size:11px; color:var(--text3);">固定ヘッダー・保存バー</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────
+       5. COMPONENTS
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">05 / Components</div>
+
+    <!-- Buttons -->
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">Button</div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div>
+          <div style="font-size:11px; color:var(--text3); margin-bottom:8px;">Variant</div>
+          <div class="btn-grid">
+            <button class="btn btn-primary">応募する →</button>
+            <button class="btn btn-secondary">案件を探す</button>
+            <button class="btn btn-ghost">あとで見る</button>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text3); margin-bottom:8px;">Size</div>
+          <div class="btn-grid">
+            <button class="btn btn-primary btn-sm">小 (sm)</button>
+            <button class="btn btn-primary">中 (default)</button>
+            <button class="btn btn-primary btn-lg">大 (lg)</button>
+            <button class="btn btn-primary btn-pill">ピル型</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Badges -->
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">Status Badge</div>
+      <div class="badge-grid">
+        <span class="bdg" style="background:rgba(29,185,84,0.1); color:#1DB954;"><span class="bdg-dot" style="background:#1DB954;"></span>確定</span>
+        <span class="bdg" style="background:rgba(124,77,255,0.1); color:#7C4DFF;"><span class="bdg-dot" style="background:#7C4DFF;"></span>面談調整中</span>
+        <span class="bdg" style="background:rgba(255,93,61,0.1); color:#FF5D3D;"><span class="bdg-dot" style="background:#FF5D3D;"></span>選考中</span>
+        <span class="bdg" style="background:rgba(33,150,243,0.1); color:#2196F3;"><span class="bdg-dot" style="background:#2196F3;"></span>応募済み</span>
+        <span class="bdg" style="background:rgba(255,82,82,0.12); color:#FF5252;">🚨 急募</span>
+        <span class="bdg" style="background:rgba(255,145,0,0.12); color:#FF9100;">🔥 人気</span>
+        <span class="bdg" style="background:rgba(124,77,255,0.12); color:#9B77FF;">✨ 新着</span>
+        <span class="bdg" style="background:rgba(0,188,212,0.12); color:#00BCD4;">🎯 おすすめ</span>
+      </div>
+    </div>
+
+    <!-- Tags -->
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">Tag / Chip</div>
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <div class="tag-grid">
+          <span class="tag tag-outline">Figma</span>
+          <span class="tag tag-outline">React</span>
+          <span class="tag tag-outline">TypeScript</span>
+          <span class="tag tag-outline">フルリモート</span>
+        </div>
+        <div class="tag-grid">
+          <span class="tag tag-accent">Figma</span>
+          <span class="tag tag-accent">React</span>
+          <span class="tag tag-accent">マッチ中</span>
+        </div>
+        <div class="tag-grid">
+          <span class="tag tag-filled">採用</span>
+          <span class="tag tag-filled">週3以下</span>
+          <span class="tag tag-filled">副業OK</span>
+          <span class="tag tag-navy">選考中</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Inputs -->
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">Input</div>
+      <div class="input-grid">
+        <input class="finput" type="text" placeholder="Default — キーワードで探す（例：React、デザイナー）">
+        <input class="finput" type="text" value="フォーカス時 — border-color: #FF5D3D" style="border-color:var(--accent); background:white;">
+        <input class="finput error" type="text" value="Error — 入力に誤りがあります">
+        <input class="finput success" type="text" value="Success — 保存しました">
+        <select class="fselect"><option>Select — カテゴリを選ぶ</option><option>IT・エンジニア</option><option>デザイン</option></select>
+      </div>
+    </div>
+
+    <!-- Avatars -->
+    <div class="g-card" style="margin-bottom:12px;">
+      <div class="g-card-title">Avatar</div>
+      <div class="avatar-grid">
+        <div>
+          <div class="av" style="width:20px;height:20px;font-size:8px;">花</div>
+          <div class="av-label">20px</div>
+        </div>
+        <div>
+          <div class="av" style="width:26px;height:26px;font-size:10px;">花</div>
+          <div class="av-label">26px</div>
+        </div>
+        <div>
+          <div class="av" style="width:32px;height:32px;font-size:12px;">花</div>
+          <div class="av-label">32px</div>
+        </div>
+        <div>
+          <div class="av" style="width:40px;height:40px;font-size:15px;">花</div>
+          <div class="av-label">40px</div>
+        </div>
+        <div>
+          <div class="av" style="width:48px;height:48px;font-size:18px;">花</div>
+          <div class="av-label">48px</div>
+        </div>
+        <div>
+          <div class="av" style="width:60px;height:60px;font-size:22px;">花</div>
+          <div class="av-label">60px</div>
+        </div>
+        <div style="margin-left:16px;">
+          <div class="av" style="width:40px;height:40px;font-size:15px;background:#DDE;color:#556;">す</div>
+          <div class="av-label">Neutral</div>
+        </div>
+        <div>
+          <div class="av" style="width:40px;height:40px;font-size:15px;background:#1DB954;">✓</div>
+          <div class="av-label">Success</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status stripe -->
+    <div class="g-card">
+      <div class="g-card-title">Card Left Stripe（応募管理カードの左帯）</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div class="stripe-demo">
+          <div class="stripe" style="background:#1DB954; height:56px;"></div>
+          <div class="stripe-card">確定 — <strong style="color:#1DB954;">#1DB954</strong></div>
+        </div>
+        <div class="stripe-demo">
+          <div class="stripe" style="background:#7C4DFF; height:56px;"></div>
+          <div class="stripe-card">面談調整中 — <strong style="color:#7C4DFF;">#7C4DFF</strong></div>
+        </div>
+        <div class="stripe-demo">
+          <div class="stripe" style="background:#FF5D3D; height:56px;"></div>
+          <div class="stripe-card">選考中 — <strong style="color:#FF5D3D;">#FF5D3D</strong></div>
+        </div>
+        <div class="stripe-demo">
+          <div class="stripe" style="background:#2196F3; height:56px;"></div>
+          <div class="stripe-card">応募済み — <strong style="color:#2196F3;">#2196F3</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────
+       6. DO / DON'T
+  ──────────────────────────────── -->
+  <div class="section">
+    <div class="section-title">06 / Do & Don't</div>
+    <div class="do-dont">
+      <div class="do-box">
+        <div class="do-label">✅ DO</div>
+        <div class="do-content">
+          • カードの角丸は14〜16pxを基本にする<br>
+          • ヒーロー・バナーはNavy（#1A2340）ベースで統一<br>
+          • アクセントカラーはPrimary（#FF5D3D）のみ使う<br>
+          • フォントはInter（英数・見出し）とNoto Sans JP（本文）を使い分ける<br>
+          • ステータスカラーはStatus定義に従う<br>
+          • ホバー時はtransform + border-colorで反応させる<br>
+          • 固定ヘッダーにはbackdrop-filter: blur(16px)を使う
+        </div>
+      </div>
+      <div class="dont-box">
+        <div class="dont-label">❌ DON'T</div>
+        <div class="dont-content">
+          • アクセントカラーを複数箇所で競合させない<br>
+          • 角丸を4px以下にしない（硬すぎる印象）<br>
+          • ステータス色をアドホックに追加しない<br>
+          • Navyとブラック（#000）を混在させない<br>
+          • フォントサイズを10px未満にしない（可読性低下）<br>
+          • シャドウを重ねすぎない（max 1層）<br>
+          • ボタンのラベルを4文字以下の省略にしない
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>

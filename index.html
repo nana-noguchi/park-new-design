@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK - ようこそ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #FF5D3D;
+      --primary-light: #FDEEE8;
+      --navy: #1a2340;
+      --navy-light: #243060;
+      --on-surface: #1C1B1F;
+      --on-surface-variant: #49454F;
+      --outline: #E0E0E0;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Noto Sans JP', -apple-system, sans-serif;
+      background: #F8F9FA;
+      color: var(--on-surface);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .header {
+      background: var(--navy);
+      color: white;
+      padding: 0 32px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-shrink: 0;
+    }
+    .logo { font-size: 20px; font-weight: 900; letter-spacing: 2px; }
+    .header-right { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #aab; }
+    .avatar {
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--primary);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; color: white;
+    }
+
+    /* ── Hero ── */
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+      color: white;
+      padding: 48px 32px 52px;
+      text-align: center;
+    }
+    .hero-eyebrow {
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      color: #ff9870;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+    .hero-title {
+      font-size: 28px;
+      font-weight: 900;
+      line-height: 1.4;
+      margin-bottom: 10px;
+    }
+    .hero-title span { color: #ff9870; }
+    .hero-sub {
+      font-size: 14px;
+      color: #aab;
+      line-height: 1.6;
+    }
+
+    /* ── Selection ── */
+    .selection {
+      flex: 1;
+      padding: 40px 32px 60px;
+      max-width: 1000px;
+      width: 100%;
+      margin: 0 auto;
+    }
+    .selection-label {
+      text-align: center;
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--on-surface-variant);
+      letter-spacing: 0.5px;
+      margin-bottom: 24px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .option-card {
+      background: white;
+      border-radius: 16px;
+      border: 2px solid var(--outline);
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      flex-direction: column;
+    }
+    .option-card:hover {
+      border-color: var(--primary);
+      box-shadow: 0 8px 32px rgba(255,93,61,0.12);
+      transform: translateY(-2px);
+    }
+
+    /* Card top */
+    .card-top {
+      padding: 28px 28px 20px;
+    }
+    .card-icon {
+      width: 52px; height: 52px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 26px;
+      margin-bottom: 16px;
+    }
+    .card-icon.find { background: #FFF3E0; }
+    .card-icon.create { background: #E3F2FD; }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--on-surface);
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--on-surface-variant);
+      line-height: 1.7;
+    }
+
+    .card-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      margin-top: 16px;
+      padding: 10px 20px;
+      border-radius: 24px;
+      font-size: 13px;
+      font-weight: 700;
+      border: none;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.15s;
+    }
+    .card-cta.find { background: var(--primary); color: white; }
+    .card-cta.find:hover { background: #c9430e; }
+    .card-cta.create { background: #1565C0; color: white; }
+    .card-cta.create:hover { background: #0d47a1; }
+
+    /* Card preview */
+    .card-preview {
+      background: #F8F9FA;
+      border-top: 1px solid var(--outline);
+      padding: 16px 20px;
+      flex: 1;
+    }
+    .preview-label {
+      font-size: 10px;
+      font-weight: 700;
+      color: #999;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    /* Job list preview */
+    .job-list { display: flex; flex-direction: column; gap: 8px; }
+    .job-item {
+      background: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      transition: box-shadow 0.15s;
+    }
+    .job-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .job-thumb {
+      width: 36px; height: 36px;
+      border-radius: 6px;
+      flex-shrink: 0;
+    }
+    .job-info { flex: 1; min-width: 0; }
+    .job-name { font-size: 12px; font-weight: 700; color: var(--on-surface); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .job-meta { font-size: 10px; color: #999; margin-top: 2px; }
+    .job-badge {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 10px;
+      flex-shrink: 0;
+    }
+    .job-badge.new { background: #FFEBEE; color: #C62828; }
+    .job-badge.hot { background: #FFF3E0; color: #E65100; }
+    .job-badge.pick { background: #E8F5E9; color: #2E7D32; }
+
+    /* Create preview */
+    .create-preview { display: flex; flex-direction: column; gap: 8px; }
+    .stat-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .stat-card {
+      background: white;
+      border-radius: 8px;
+      padding: 10px 12px;
+      border: 1px solid var(--outline);
+      text-align: center;
+    }
+    .stat-value { font-size: 20px; font-weight: 900; color: var(--primary); }
+    .stat-label { font-size: 10px; color: #999; margin-top: 2px; }
+
+    .step-list { display: flex; flex-direction: column; gap: 6px; }
+    .step-item {
+      background: white;
+      border-radius: 8px;
+      padding: 8px 12px;
+      border: 1px solid var(--outline);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--on-surface-variant);
+    }
+    .step-num {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: var(--navy);
+      color: white;
+      font-size: 10px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+
+    /* Overlay modal */
+    .overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 100;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+    .overlay.show { opacity: 1; pointer-events: auto; }
+    .modal {
+      background: white;
+      border-radius: 16px;
+      padding: 36px;
+      max-width: 400px;
+      width: 90%;
+      text-align: center;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+    .overlay.show .modal { transform: scale(1); }
+    .modal-icon { font-size: 48px; margin-bottom: 12px; }
+    .modal-title { font-size: 20px; font-weight: 900; margin-bottom: 8px; }
+    .modal-desc { font-size: 13px; color: var(--on-surface-variant); line-height: 1.7; margin-bottom: 24px; }
+    .modal-btn {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: none;
+      font-size: 14px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      margin-bottom: 10px;
+    }
+    .modal-btn.primary { background: var(--primary); color: white; }
+    .modal-btn.secondary { background: #F5F5F5; color: var(--on-surface); }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">PARK</span>
+  <div class="header-right">
+    <div class="avatar">花</div>
+    <span>テスト 花子</span>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="hero-eyebrow">Welcome back</div>
+  <div class="hero-title">今日は何をしますか？<br><span>花子さん</span></div>
+  <div class="hero-sub">PARKで、あなたの次のステップを見つけましょう。</div>
+</div>
+
+<div class="selection">
+  <div class="selection-label">やりたいことを選んでください</div>
+
+  <div class="cards">
+
+    <!-- 案件を探す -->
+    <div class="option-card" onclick="openModal('find')">
+      <div class="card-top">
+        <div class="card-icon find">🔍</div>
+        <div class="card-title">案件を探す</div>
+        <div class="card-desc">あなたのスキルや希望に合った案件を見つけましょう。スカウトを受け取ったり、気になる企業に応募できます。</div>
+        <button class="card-cta find">案件を探す →</button>
+      </div>
+      <div class="card-preview">
+        <div class="preview-label">おすすめ案件</div>
+        <div class="job-list">
+          <div class="job-item">
+            <div class="job-thumb" style="background: linear-gradient(135deg,#FFB74D,#FF7043);"></div>
+            <div class="job-info">
+              <div class="job-name">Webエンジニア（React）</div>
+              <div class="job-meta">株式会社ABC・東京・週3〜</div>
+            </div>
+            <span class="job-badge new">NEW</span>
+          </div>
+          <div class="job-item">
+            <div class="job-thumb" style="background: linear-gradient(135deg,#81C784,#26A69A);"></div>
+            <div class="job-info">
+              <div class="job-name">UIデザイナー</div>
+              <div class="job-meta">株式会社DEF・リモート可</div>
+            </div>
+            <span class="job-badge hot">HOT</span>
+          </div>
+          <div class="job-item">
+            <div class="job-thumb" style="background: linear-gradient(135deg,#64B5F6,#7986CB);"></div>
+            <div class="job-info">
+              <div class="job-name">プロダクトマネージャー</div>
+              <div class="job-meta">株式会社GHI・フルリモート</div>
+            </div>
+            <span class="job-badge pick">PICK</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 案件をつくる -->
+    <div class="option-card" onclick="openModal('create')">
+      <div class="card-top">
+        <div class="card-icon create">✏️</div>
+        <div class="card-title">案件をつくる</div>
+        <div class="card-desc">求人票を作成して優秀な人材をスカウトしましょう。AIがあなたの案件に最適な候補者を提案します。</div>
+        <button class="card-cta create">案件をつくる →</button>
+      </div>
+      <div class="card-preview">
+        <div class="preview-label">現在の状況</div>
+        <div class="create-preview">
+          <div class="stat-row">
+            <div class="stat-card">
+              <div class="stat-value">3</div>
+              <div class="stat-label">公開中の案件</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-value">12</div>
+              <div class="stat-label">今週の応募</div>
+            </div>
+          </div>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <span>案件情報を入力（タイトル・業種・条件）</span>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <span>AIがマッチする候補者を自動抽出</span>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <span>スカウトを送信して採用を進める</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Modal: 案件を探す -->
+<div class="overlay" id="modal-find" onclick="closeModal('find')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-icon">🔍</div>
+    <div class="modal-title">案件を探す</div>
+    <div class="modal-desc">スキルや希望条件を登録すると、あなたに合った案件が届きます。まずはプロフィールを確認しましょう。</div>
+    <button class="modal-btn primary" onclick="location.href='job-search/best.html'">案件一覧へ進む</button>
+    <button class="modal-btn secondary" onclick="closeModal('find')">戻る</button>
+  </div>
+</div>
+
+<!-- Modal: 案件をつくる -->
+<div class="overlay" id="modal-create" onclick="closeModal('create')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-icon">✏️</div>
+    <div class="modal-title">案件をつくる</div>
+    <div class="modal-desc">求人票の作成を開始します。AIがタイトルや条件からおすすめの候補者を提案するので、ぜひ詳しく入力してください。</div>
+    <button class="modal-btn primary" onclick="location.href='worker-search/create.html'">作成をはじめる</button>
+    <button class="modal-btn secondary" onclick="closeModal('create')">戻る</button>
+  </div>
+</div>
+
+<script>
+  function openModal(type) {
+    document.getElementById('modal-' + type).classList.add('show');
+  }
+  function closeModal(type) {
+    document.getElementById('modal-' + type).classList.remove('show');
+  }
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.overlay.show').forEach(o => o.classList.remove('show'));
+    }
+  });
+</script>
+</body>
+</html>

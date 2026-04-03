@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK — 応募する</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #F4F2EF;
+      --surface: #FFFFFF;
+      --surface2:#F9F8F6;
+      --border:  rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.13);
+      --text:    #1A1A1A;
+      --text2:   #666;
+      --text3:   #AAA;
+      --accent:  #FF5D3D;
+      --navy:    #1a2340;
+      --green:   #1DB954;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      height: 52px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 16px;
+    }
+    .logo {
+      font-family: 'Inter', sans-serif;
+      font-size: 18px; font-weight: 800;
+      letter-spacing: 3px; color: #1A1A1A;
+      flex-shrink: 0;
+    }
+    .logo span { color: var(--accent); }
+    .topbar-sep { width:1px; height:20px; background: var(--border2); }
+    .topbar-crumb {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; color: var(--text2);
+    }
+    .topbar-crumb .cur { color: var(--text); font-weight: 500; }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+    .user-pill {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 24px; padding: 4px 12px 4px 4px; cursor: pointer;
+    }
+    .uavatar {
+      width:26px; height:26px; border-radius:50%;
+      background: var(--accent);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:white;
+    }
+    .uname { font-size:12px; color:var(--text2); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      padding-top: 52px;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding-left: 24px;
+      padding-right: 24px;
+      padding-top: 72px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* ── MAIN FORM ── */
+    .form-wrap { flex: 1; min-width: 0; padding-bottom: 80px; }
+
+    /* progress */
+    .progress-bar {
+      display: flex; align-items: center;
+      gap: 0;
+      margin-bottom: 28px;
+    }
+    .pstep {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--text3);
+      flex: 1;
+    }
+    .pstep:last-child { flex: 0; }
+    .pnum {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 700;
+      border: 2px solid var(--border2);
+      color: var(--text3);
+      flex-shrink: 0;
+      transition: all 0.2s;
+    }
+    .pstep.done .pnum  { background: var(--green); border-color: var(--green); color: white; }
+    .pstep.active .pnum { background: var(--accent); border-color: var(--accent); color: white; }
+    .pstep.active { color: var(--text); font-weight: 500; }
+    .pline {
+      flex: 1; height: 2px;
+      background: var(--border2);
+      margin: 0 8px;
+      position: relative;
+    }
+    .pline.filled { background: var(--green); }
+
+    /* job mini-card (top) */
+    .job-mini {
+      background: var(--navy);
+      border-radius: 14px;
+      padding: 20px 24px;
+      display: flex; align-items: center; gap: 16px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .job-mini::after {
+      content: '';
+      position: absolute; right:-30px; top:-30px;
+      width:160px; height:160px; border-radius:50%;
+      background: radial-gradient(circle, rgba(255,92,53,0.2) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .jm-thumb {
+      width: 52px; height: 52px; border-radius: 10px;
+      background: linear-gradient(135deg,#a18cd1,#fbc2eb);
+      flex-shrink: 0;
+    }
+    .jm-info { flex: 1; }
+    .jm-role { font-size: 16px; font-weight: 700; color: white; margin-bottom: 4px; }
+    .jm-company { font-size: 12px; color: rgba(255,255,255,0.5); }
+    .jm-tags { display:flex; gap:6px; margin-top:8px; flex-wrap:wrap; }
+    .jm-tag {
+      padding: 2px 8px; border-radius:5px;
+      font-size: 10px; font-weight: 700;
+      background: rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.7);
+    }
+    .match-pill {
+      background: rgba(29,185,84,0.15);
+      border: 1px solid rgba(29,185,84,0.3);
+      color: #1DB954;
+      font-size: 12px; font-weight: 700;
+      padding: 6px 14px; border-radius: 20px;
+      flex-shrink: 0;
+    }
+
+    /* section card */
+    .scard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 16px;
+      overflow: hidden;
+    }
+    .scard-head {
+      padding: 18px 22px 14px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .scard-icon {
+      width: 30px; height: 30px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; flex-shrink: 0;
+    }
+    .scard-title { font-size: 14px; font-weight: 700; color: var(--text); }
+    .scard-desc  { font-size: 11px; color: var(--text2); margin-top: 2px; }
+    .scard-body  { padding: 20px 22px; }
+
+    /* form elements */
+    label.flabel {
+      display: block;
+      font-size: 12px; font-weight: 700;
+      color: var(--text2);
+      margin-bottom: 6px;
+    }
+    label.flabel .req {
+      color: var(--accent); margin-left: 4px; font-size: 10px;
+    }
+    .finput, .fselect, .ftextarea {
+      width: 100%;
+      background: var(--bg);
+      border: 1.5px solid var(--border2);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-family: inherit;
+      color: var(--text);
+      outline: none;
+      transition: border-color 0.15s;
+    }
+    .finput:focus, .fselect:focus, .ftextarea:focus {
+      border-color: var(--accent);
+      background: white;
+    }
+    .ftextarea { resize: vertical; min-height: 120px; line-height: 1.7; }
+    .char-count {
+      text-align: right; font-size: 11px; color: var(--text3); margin-top: 4px;
+    }
+    .char-count.warn { color: var(--accent); }
+
+    .frow { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .fgroup { margin-bottom: 18px; }
+    .fgroup:last-child { margin-bottom: 0; }
+
+    /* radio cards */
+    .radio-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 8px; }
+    .rcard {
+      border: 2px solid var(--border2);
+      border-radius: 10px;
+      padding: 12px 14px;
+      cursor: pointer;
+      transition: all 0.15s;
+      user-select: none;
+    }
+    .rcard:hover { border-color: var(--accent); }
+    .rcard.on { border-color: var(--accent); background: rgba(255,93,61,0.05); }
+    .rcard input { display: none; }
+    .rcard-label { font-size: 13px; font-weight: 700; color: var(--text); }
+    .rcard-sub { font-size: 11px; color: var(--text2); margin-top: 3px; }
+    .rcard.on .rcard-label { color: var(--accent); }
+
+    /* file drop */
+    .file-drop {
+      border: 2px dashed var(--border2);
+      border-radius: 12px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.15s;
+      background: var(--bg);
+    }
+    .file-drop:hover { border-color: var(--accent); background: rgba(255,93,61,0.03); }
+    .file-drop-icon { font-size: 28px; margin-bottom: 8px; }
+    .file-drop-text { font-size: 13px; color: var(--text2); }
+    .file-drop-sub { font-size: 11px; color: var(--text3); margin-top: 4px; }
+    .file-item {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg); border-radius: 8px; padding: 10px 14px;
+      margin-top: 8px; border: 1px solid var(--border);
+    }
+    .file-icon { font-size: 18px; }
+    .file-name { flex: 1; font-size: 12px; font-weight: 500; }
+    .file-size { font-size: 11px; color: var(--text3); }
+    .file-del { font-size: 16px; color: var(--text3); cursor: pointer; border: none; background: none; }
+    .file-del:hover { color: #e74c3c; }
+
+    /* submit bar */
+    .submit-bar {
+      position: fixed; bottom: 0; left: 0; right: 0;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      padding: 14px 24px;
+      display: flex; justify-content: center; align-items: center; gap: 12px;
+      z-index: 50;
+    }
+    .btn-back {
+      padding: 11px 24px;
+      border: 1.5px solid var(--border2);
+      border-radius: 10px;
+      background: none;
+      font-size: 13px; font-weight: 700;
+      font-family: inherit; color: var(--text2);
+      cursor: pointer; transition: all 0.15s;
+    }
+    .btn-back:hover { border-color: var(--text2); color: var(--text); }
+    .btn-submit {
+      padding: 11px 40px;
+      background: var(--accent);
+      color: white; border: none;
+      border-radius: 10px;
+      font-size: 14px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      transition: all 0.15s;
+      box-shadow: 0 4px 14px rgba(255,93,61,0.3);
+    }
+    .btn-submit:hover { background: #c9430e; box-shadow: 0 6px 18px rgba(255,93,61,0.4); transform: translateY(-1px); }
+    .btn-submit:active { transform: none; }
+
+    /* ── SIDEBAR ── */
+    .aside {
+      width: 260px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 72px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .aside-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px;
+    }
+    .aside-title {
+      font-size: 11px; font-weight: 700;
+      color: var(--text3); letter-spacing: 1px;
+      text-transform: uppercase; margin-bottom: 14px;
+    }
+    .checklist { display: flex; flex-direction: column; gap: 8px; }
+    .citem {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 12px;
+    }
+    .cmark {
+      width: 20px; height: 20px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; flex-shrink: 0;
+      border: 2px solid var(--border2); color: var(--text3);
+    }
+    .cmark.done { background: var(--green); border-color: var(--green); color: white; }
+    .cmark.active { border-color: var(--accent); color: var(--accent); }
+    .ctext { color: var(--text2); }
+    .ctext.done { color: var(--text); }
+
+    .aside-tip {
+      background: rgba(255,93,61,0.05);
+      border: 1px solid rgba(255,93,61,0.15);
+      border-radius: 10px; padding: 12px 14px;
+      font-size: 12px; color: var(--text2); line-height: 1.6;
+    }
+    .aside-tip strong { color: var(--accent); }
+
+    .deadline-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .deadline-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .dl-label { color: var(--text2); flex: 1; }
+    .dl-val { font-weight: 700; color: var(--text); }
+    .dl-val.urgent { color: var(--accent); }
+
+    /* toast */
+    .toast {
+      position: fixed; bottom: 80px; left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1A1A1A; color: white;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 13px; opacity: 0;
+      transition: all 0.25s; pointer-events: none; z-index: 200;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">P<span>A</span>RK</div>
+  <div class="topbar-sep"></div>
+  <div class="topbar-crumb">
+    <span style="cursor:pointer" onclick="location.href='best.html'">案件一覧</span>
+    <span>›</span>
+    <span>UIデザイナー</span>
+    <span>›</span>
+    <span class="cur">応募する</span>
+  </div>
+  <div class="topbar-right">
+    <div class="user-pill">
+      <div class="uavatar">花</div>
+      <span class="uname">花子さん</span>
+    </div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- FORM -->
+  <div class="form-wrap">
+
+    <!-- progress -->
+    <div class="progress-bar">
+      <div class="pstep done">
+        <div class="pnum">✓</div>
+        <span>プロフィール確認</span>
+      </div>
+      <div class="pline filled"></div>
+      <div class="pstep active">
+        <div class="pnum">2</div>
+        <span>応募内容の入力</span>
+      </div>
+      <div class="pline"></div>
+      <div class="pstep">
+        <div class="pnum">3</div>
+        <span>確認・送信</span>
+      </div>
+    </div>
+
+    <!-- job mini -->
+    <div class="job-mini">
+      <div class="jm-thumb"></div>
+      <div class="jm-info">
+        <div class="jm-role">UIデザイナー（週3〜、フルリモート可）</div>
+        <div class="jm-company">株式会社DEF</div>
+        <div class="jm-tags">
+          <span class="jm-tag">Figma</span>
+          <span class="jm-tag">UI/UX</span>
+          <span class="jm-tag">フルリモート</span>
+          <span class="jm-tag">〜80万円/月</span>
+        </div>
+      </div>
+      <div class="match-pill">91% マッチ</div>
+    </div>
+
+    <!-- 志望動機 -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#FFF0EB;">✍️</div>
+        <div>
+          <div class="scard-title">志望動機</div>
+          <div class="scard-desc">この案件に応募する理由を具体的に書いてください</div>
+        </div>
+      </div>
+      <div class="scard-body">
+        <div class="fgroup">
+          <label class="flabel">志望動機 <span class="req">必須</span></label>
+          <textarea class="ftextarea" id="motivation" oninput="countChars('motivation','mc',300)"
+            placeholder="例：貴社のプロダクトのユーザー体験に強く共感し、自分のFigmaやUIデザインの経験を活かして貢献できると感じたため応募しました。"></textarea>
+          <div class="char-count" id="mc">0 / 300文字</div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">この案件で特に興味を持った点</label>
+          <textarea class="ftextarea" style="min-height:80px;" id="interest" oninput="countChars('interest','ic',200)"
+            placeholder="例：フルリモートで週3〜という働き方の柔軟性と、デザインシステム構築のフェーズから携われる点に魅力を感じました。"></textarea>
+          <div class="char-count" id="ic">0 / 200文字</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 経験・スキル -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#EEF2FF;">💼</div>
+        <div>
+          <div class="scard-title">経験・スキル</div>
+          <div class="scard-desc">関連する実務経験やスキルをアピールしてください</div>
+        </div>
+      </div>
+      <div class="scard-body">
+        <div class="frow fgroup">
+          <div>
+            <label class="flabel">デザイン経験年数 <span class="req">必須</span></label>
+            <select class="fselect">
+              <option value="">選択してください</option>
+              <option>1年未満</option>
+              <option selected>1〜3年</option>
+              <option>3〜5年</option>
+              <option>5〜10年</option>
+              <option>10年以上</option>
+            </select>
+          </div>
+          <div>
+            <label class="flabel">主な使用ツール <span class="req">必須</span></label>
+            <input class="finput" type="text" value="Figma, Notion, FigJam" placeholder="Figma, Adobe XD...">
+          </div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">自己PR・強み <span class="req">必須</span></label>
+          <textarea class="ftextarea" id="pr" oninput="countChars('pr','prc',400)"
+            placeholder="これまでの実績や、この案件で発揮できる強みを教えてください。"></textarea>
+          <div class="char-count" id="prc">0 / 400文字</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 希望条件 -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#F0FFF4;">📋</div>
+        <div>
+          <div class="scard-title">希望条件</div>
+          <div class="scard-desc">稼働開始時期や働き方の希望を教えてください</div>
+        </div>
+      </div>
+      <div class="scard-body">
+        <div class="fgroup">
+          <label class="flabel">稼働開始可能時期 <span class="req">必須</span></label>
+          <div class="radio-cards">
+            <label class="rcard on" onclick="selectR(this)">
+              <input type="radio" name="start" checked>
+              <div class="rcard-label">即日〜1週間</div>
+              <div class="rcard-sub">すぐに開始可能</div>
+            </label>
+            <label class="rcard" onclick="selectR(this)">
+              <input type="radio" name="start">
+              <div class="rcard-label">1ヶ月以内</div>
+              <div class="rcard-sub">引き継ぎ等あり</div>
+            </label>
+            <label class="rcard" onclick="selectR(this)">
+              <input type="radio" name="start">
+              <div class="rcard-label">要相談</div>
+              <div class="rcard-sub">詳細は面談で</div>
+            </label>
+          </div>
+        </div>
+        <div class="frow fgroup">
+          <div>
+            <label class="flabel">希望稼働日数</label>
+            <select class="fselect">
+              <option>週1〜2日</option>
+              <option selected>週3日</option>
+              <option>週4〜5日</option>
+              <option>フレキシブル</option>
+            </select>
+          </div>
+          <div>
+            <label class="flabel">希望単価（目安）</label>
+            <input class="finput" type="text" placeholder="例：60〜80万円/月">
+          </div>
+        </div>
+        <div class="fgroup">
+          <label class="flabel">その他・補足</label>
+          <textarea class="ftextarea" style="min-height:80px;"
+            placeholder="その他、ご要望や補足事項があれば記入してください。"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 書類添付 -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#FFF8E1;">📎</div>
+        <div>
+          <div class="scard-title">書類・ポートフォリオ</div>
+          <div class="scard-desc">PDF・Figma URLなど（任意）</div>
+        </div>
+      </div>
+      <div class="scard-body">
+        <div class="file-drop" onclick="fakeUpload()">
+          <div class="file-drop-icon">📁</div>
+          <div class="file-drop-text">クリックしてファイルを選択、またはドラッグ＆ドロップ</div>
+          <div class="file-drop-sub">PDF, PNG, JPG（最大10MB）</div>
+        </div>
+        <div class="file-item">
+          <span class="file-icon">📄</span>
+          <span class="file-name">portfolio_2026.pdf</span>
+          <span class="file-size">2.4 MB</span>
+          <button class="file-del" onclick="removeFile(this)">✕</button>
+        </div>
+        <div class="fgroup" style="margin-top:14px; margin-bottom:0;">
+          <label class="flabel">ポートフォリオURL（Figma / Notion など）</label>
+          <input class="finput" type="text" placeholder="https://www.figma.com/file/...">
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /form-wrap -->
+
+  <!-- ASIDE -->
+  <div class="aside">
+
+    <!-- checklist -->
+    <div class="aside-card">
+      <div class="aside-title">入力チェック</div>
+      <div class="checklist">
+        <div class="citem"><div class="cmark done">✓</div><span class="ctext done">プロフィール情報</span></div>
+        <div class="citem"><div class="cmark done">✓</div><span class="ctext done">志望動機</span></div>
+        <div class="citem"><div class="cmark active">2</div><span class="ctext">経験・スキル入力中</span></div>
+        <div class="citem"><div class="cmark">　</div><span class="ctext">希望条件</span></div>
+        <div class="citem"><div class="cmark">　</div><span class="ctext">書類添付（任意）</span></div>
+      </div>
+    </div>
+
+    <!-- deadline -->
+    <div class="aside-card">
+      <div class="aside-title">案件情報</div>
+      <div class="deadline-row">
+        <span class="dl-label">応募締切</span>
+        <span class="dl-val urgent">4/10（木）</span>
+      </div>
+      <div class="deadline-row">
+        <span class="dl-label">面談形式</span>
+        <span class="dl-val">オンライン</span>
+      </div>
+      <div class="deadline-row">
+        <span class="dl-label">選考ステップ</span>
+        <span class="dl-val">書類 → 面談1回</span>
+      </div>
+      <div class="deadline-row">
+        <span class="dl-label">応募者数</span>
+        <span class="dl-val">14人</span>
+      </div>
+    </div>
+
+    <!-- tip -->
+    <div class="aside-tip">
+      <strong>💡 採用担当からのコメント</strong><br>
+      志望動機は「なぜ弊社か」を具体的に書いてもらえると嬉しいです。ポートフォリオがあれば必ず添付してください。
+    </div>
+
+  </div><!-- /aside -->
+
+</div><!-- /layout -->
+
+<!-- submit bar -->
+<div class="submit-bar">
+  <button class="btn-back" onclick="location.href='best.html'">← 戻る</button>
+  <button class="btn-submit" onclick="location.href='applications.html'">内容を確認する →</button>
+</div>
+
+<!-- toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  function countChars(id, countId, max) {
+    const el = document.getElementById(id);
+    const cnt = document.getElementById(countId);
+    const len = el.value.length;
+    cnt.textContent = `${len} / ${max}文字`;
+    cnt.classList.toggle('warn', len > max * 0.9);
+  }
+
+  function selectR(card) {
+    card.closest('.radio-cards').querySelectorAll('.rcard').forEach(c => c.classList.remove('on'));
+    card.classList.add('on');
+  }
+
+  function fakeUpload() {
+    showToast('📁 ファイル選択ダイアログ（実装予定）');
+  }
+
+  function removeFile(btn) {
+    btn.closest('.file-item').remove();
+  }
+
+  function submit() {
+    showToast('✅ 確認画面へ進みます（実装予定）');
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>

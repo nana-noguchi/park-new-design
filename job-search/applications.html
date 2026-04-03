@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK — 応募管理</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #F4F2EF;
+      --surface: #FFFFFF;
+      --surface2:#F9F8F6;
+      --border:  rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.13);
+      --text:    #1A1A1A;
+      --text2:   #666;
+      --text3:   #AAA;
+      --accent:  #FF5D3D;
+      --navy:    #1a2340;
+
+      --s-confirmed: #1DB954;
+      --s-interview: #7C4DFF;
+      --s-reviewing: #FF5D3D;
+      --s-applied:   #2196F3;
+      --s-rejected:  #AAA;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 13px;
+      min-height: 100vh;
+    }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position: fixed; top:0; left:0; right:0; z-index:100;
+      height: 52px;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 24px; gap: 24px;
+    }
+    .logo { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; color:#1A1A1A; flex-shrink:0; }
+    .logo span { color: var(--accent); }
+    .topbar-nav { display:flex; align-items:center; gap:2px; }
+    .tnav {
+      padding: 6px 12px; border-radius: 8px;
+      font-size: 12px; color: var(--text2);
+      cursor: pointer; transition: all 0.15s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .tnav:hover { background: var(--surface); color: var(--text); }
+    .tnav.active { color: var(--text); background: var(--surface); font-weight:500; }
+    .tnav .nbadge { background:var(--accent); color:white; font-size:9px; font-weight:700; padding:1px 5px; border-radius:8px; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .user-pill { display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border2); border-radius:24px; padding:4px 12px 4px 4px; cursor:pointer; }
+    .uavatar { width:26px; height:26px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; }
+    .uname { font-size:12px; color:var(--text2); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 72px 24px 80px;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width: 200px; flex-shrink:0;
+      position: sticky; top: 72px;
+    }
+    .sidebar-label { font-size:10px; font-weight:700; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:8px; padding:0 8px; }
+    .s-chip {
+      display:flex; align-items:center; gap:8px;
+      padding: 8px 10px; border-radius:8px; cursor:pointer;
+      transition:all 0.12s; color:var(--text2); margin-bottom:2px;
+    }
+    .s-chip:hover { background:var(--surface); color:var(--text); }
+    .s-chip.on { background:var(--surface); color:var(--text); font-weight:500; }
+    .s-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .s-label { flex:1; font-size:12px; }
+    .s-count { font-size:11px; color:var(--text3); }
+
+    /* ── MAIN ── */
+    .main { flex:1; min-width:0; }
+
+    /* summary strip */
+    .summary {
+      background: var(--navy);
+      border-radius: 16px;
+      padding: 22px 28px;
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 0;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+    .summary::after {
+      content:'';
+      position:absolute; right:-40px; top:-40px;
+      width:200px; height:200px; border-radius:50%;
+      background: radial-gradient(circle, rgba(255,93,61,0.2) 0%, transparent 70%);
+      pointer-events:none;
+    }
+    .sstat {
+      text-align:center;
+      padding: 0 16px;
+      border-right: 1px solid rgba(255,255,255,0.08);
+    }
+    .sstat:first-child { padding-left:0; }
+    .sstat:last-child  { border-right:none; padding-right:0; }
+    .sstat-val {
+      font-family:'Inter',sans-serif;
+      font-size:28px; font-weight:800; color:white; line-height:1;
+      margin-bottom:4px;
+    }
+    .sstat-label { font-size:11px; color:rgba(255,255,255,0.4); }
+    .sstat-dot {
+      display:inline-block;
+      width:8px; height:8px; border-radius:50%;
+      margin-right:4px; vertical-align:middle;
+    }
+
+    /* bar */
+    .bar { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .bar-title { font-size:16px; font-weight:700; color:var(--text); flex:1; }
+    .sort-sel {
+      border:1.5px solid var(--border2); border-radius:8px;
+      padding:7px 28px 7px 12px; font-size:12px;
+      font-family:inherit; color:var(--text2); background:white;
+      cursor:pointer; outline:none;
+      appearance:none;
+      background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' viewBox='0 0 24 24' fill='none' stroke='%23aaa' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+      background-repeat:no-repeat; background-position:right 10px center;
+    }
+
+    /* ── APPLICATION CARD ── */
+    .acard {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      margin-bottom: 10px;
+      overflow: hidden;
+      transition: all 0.18s;
+      cursor: pointer;
+    }
+    .acard:hover { border-color: var(--border2); box-shadow: 0 4px 16px rgba(0,0,0,0.06); transform: translateX(2px); }
+
+    .acard-main {
+      display: flex; align-items: stretch; gap: 0;
+    }
+
+    /* status stripe */
+    .acard-stripe { width:5px; flex-shrink:0; border-radius:14px 0 0 14px; }
+
+    /* thumb */
+    .acard-thumb {
+      width: 72px; flex-shrink:0;
+      margin: 14px 0 14px 14px;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .acard-thumb .tbg { width:100%; height:100%; min-height:72px; }
+
+    /* body */
+    .acard-body { flex:1; padding:16px 18px; min-width:0; }
+    .acard-top { display:flex; align-items:flex-start; gap:10px; margin-bottom:8px; }
+    .acard-info { flex:1; min-width:0; }
+    .acard-role { font-size:15px; font-weight:700; color:var(--text); margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .acard-company { font-size:12px; color:var(--text2); }
+
+    /* status badge */
+    .status-badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding: 5px 12px; border-radius:20px;
+      font-size:11px; font-weight:700;
+      flex-shrink:0; white-space:nowrap;
+    }
+    .status-badge .sdot { width:6px; height:6px; border-radius:50%; }
+
+    .sb-confirmed { background:rgba(29,185,84,0.1);  color:var(--s-confirmed); }
+    .sb-interview { background:rgba(124,77,255,0.1); color:var(--s-interview); }
+    .sb-reviewing { background:rgba(255,93,61,0.1);  color:var(--s-reviewing); }
+    .sb-applied   { background:rgba(33,150,243,0.1); color:var(--s-applied); }
+    .sb-rejected  { background:rgba(0,0,0,0.05);     color:var(--s-rejected); }
+
+    .acard-tags { display:flex; gap:5px; flex-wrap:wrap; margin-bottom:10px; }
+    .atag { padding:3px 9px; border-radius:6px; border:1px solid var(--border2); font-size:11px; color:var(--text2); }
+
+    /* timeline */
+    .acard-timeline {
+      display:flex; align-items:center; gap:0;
+      padding: 10px 0 2px;
+      border-top: 1px solid var(--border);
+    }
+    .tl-step {
+      display:flex; align-items:center; gap:4px;
+      font-size:11px; color:var(--text3); flex:1;
+    }
+    .tl-step:last-child { flex:0; }
+    .tl-dot { width:8px; height:8px; border-radius:50%; background:var(--border2); flex-shrink:0; }
+    .tl-dot.done { background:var(--s-confirmed); }
+    .tl-dot.active { background:var(--accent); box-shadow:0 0 0 3px rgba(255,93,61,0.2); }
+    .tl-dot.pending { background:var(--border2); }
+    .tl-line { flex:1; height:2px; background:var(--border2); margin:0 4px; }
+    .tl-line.done { background:var(--s-confirmed); }
+    .tl-label { white-space:nowrap; }
+    .tl-step.done .tl-label { color:var(--s-confirmed); }
+    .tl-step.active .tl-label { color:var(--accent); font-weight:700; }
+
+    /* right meta panel */
+    .acard-meta {
+      width:160px; flex-shrink:0;
+      border-left:1px solid var(--border);
+      padding:16px 16px;
+      display:flex; flex-direction:column; justify-content:space-between;
+    }
+    .meta-row { margin-bottom:10px; }
+    .meta-row:last-child { margin-bottom:0; }
+    .meta-label { font-size:10px; color:var(--text3); font-weight:700; text-transform:uppercase; letter-spacing:0.8px; margin-bottom:2px; }
+    .meta-val { font-size:12px; color:var(--text); font-weight:500; }
+    .meta-val.accent { color:var(--accent); font-weight:700; }
+    .meta-val.confirmed { color:var(--s-confirmed); font-weight:700; }
+
+    .action-btn {
+      width:100%; padding:8px;
+      border-radius:8px; border:1.5px solid var(--border2);
+      background:none; font-size:12px; font-weight:700;
+      font-family:inherit; color:var(--text2); cursor:pointer;
+      transition:all 0.15s; margin-top:8px; text-align:center;
+    }
+    .action-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .action-btn.primary { background:var(--accent); border-color:var(--accent); color:white; }
+    .action-btn.primary:hover { background:#c9430e; }
+
+    /* confirmed card highlight */
+    .acard.confirmed { border-color: rgba(29,185,84,0.25); }
+    .acard.confirmed:hover { border-color: rgba(29,185,84,0.5); }
+
+    /* section title */
+    .section-sep {
+      display:flex; align-items:center; gap:10px;
+      margin: 24px 0 14px;
+    }
+    .section-sep-line { flex:1; height:1px; background:var(--border); }
+    .section-sep-text { font-size:11px; font-weight:700; color:var(--text3); letter-spacing:1px; text-transform:uppercase; white-space:nowrap; }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">P<span>A</span>RK</div>
+  <div class="topbar-nav">
+    <div class="tnav" onclick="location.href='best.html'">案件</div>
+    <div class="tnav active">応募 <span class="nbadge">6</span></div>
+    <div class="tnav">チャット <span class="nbadge">17</span></div>
+    <div class="tnav">設定</div>
+  </div>
+  <div class="topbar-right">
+    <div class="user-pill">
+      <div class="uavatar">花</div>
+      <span class="uname">花子さん</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-label" style="margin-bottom:12px;">ステータス</div>
+    <div class="s-chip on" onclick="filterStatus(this,'all')">
+      <span class="s-dot" style="background:#ccc;"></span>
+      <span class="s-label">すべて</span>
+      <span class="s-count">6</span>
+    </div>
+    <div class="s-chip" onclick="filterStatus(this,'confirmed')">
+      <span class="s-dot" style="background:var(--s-confirmed);"></span>
+      <span class="s-label">確定</span>
+      <span class="s-count">2</span>
+    </div>
+    <div class="s-chip" onclick="filterStatus(this,'interview')">
+      <span class="s-dot" style="background:var(--s-interview);"></span>
+      <span class="s-label">面談調整中</span>
+      <span class="s-count">1</span>
+    </div>
+    <div class="s-chip" onclick="filterStatus(this,'reviewing')">
+      <span class="s-dot" style="background:var(--s-reviewing);"></span>
+      <span class="s-label">選考中</span>
+      <span class="s-count">2</span>
+    </div>
+    <div class="s-chip" onclick="filterStatus(this,'applied')">
+      <span class="s-dot" style="background:var(--s-applied);"></span>
+      <span class="s-label">応募済み</span>
+      <span class="s-count">1</span>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- summary -->
+    <div class="summary">
+      <div class="sstat">
+        <div class="sstat-val">6</div>
+        <div class="sstat-label">応募総数</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat-val" style="color:#1DB954;">2</div>
+        <div class="sstat-label"><span class="sstat-dot" style="background:#1DB954;"></span>確定</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat-val" style="color:#9B77FF;">1</div>
+        <div class="sstat-label"><span class="sstat-dot" style="background:#9B77FF;"></span>面談調整中</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat-val" style="color:#FF5D3D;">2</div>
+        <div class="sstat-label"><span class="sstat-dot" style="background:#FF5D3D;"></span>選考中</div>
+      </div>
+      <div class="sstat">
+        <div class="sstat-val" style="color:#64B5F6;">1</div>
+        <div class="sstat-label"><span class="sstat-dot" style="background:#64B5F6;"></span>応募済み</div>
+      </div>
+    </div>
+
+    <!-- bar -->
+    <div class="bar">
+      <div class="bar-title">応募中の案件</div>
+      <select class="sort-sel"><option>応募日の新しい順</option><option>ステータス順</option></select>
+    </div>
+
+    <!-- ── 確定 ── -->
+    <div class="section-sep">
+      <div class="section-sep-line"></div>
+      <div class="section-sep-text">✅ 確定</div>
+      <div class="section-sep-line"></div>
+    </div>
+
+    <!-- Card: confirmed 1 -->
+    <div class="acard confirmed" data-status="confirmed">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-confirmed);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">UIデザイナー（週3〜、フルリモート可）</div>
+              <div class="acard-company">株式会社DEF</div>
+            </div>
+            <div class="status-badge sb-confirmed">
+              <span class="sdot" style="background:var(--s-confirmed);"></span>
+              確定
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">Figma</span>
+            <span class="atag">UI/UX</span>
+            <span class="atag">フルリモート</span>
+            <span class="atag">〜80万円/月</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">書類選考</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">面談</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">条件確認</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">✅ 確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">稼働開始</div><div class="meta-val confirmed">4/15〜</div></div>
+            <div class="meta-row"><div class="meta-label">稼働日数</div><div class="meta-val">週3日</div></div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">3/28</div></div>
+          </div>
+          <button class="action-btn primary">チャットを開く</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: confirmed 2 -->
+    <div class="acard confirmed" data-status="confirmed">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-confirmed);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#56ab2f,#a8e063);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">SNSマーケター（Instagram・TikTok）</div>
+              <div class="acard-company">株式会社JKL</div>
+            </div>
+            <div class="status-badge sb-confirmed">
+              <span class="sdot" style="background:var(--s-confirmed);"></span>
+              確定
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">SNS運用</span>
+            <span class="atag">マーケ</span>
+            <span class="atag">副業OK</span>
+            <span class="atag">週2出社</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">書類選考</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">面談</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">条件確認</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">✅ 確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">稼働開始</div><div class="meta-val confirmed">4/1〜</div></div>
+            <div class="meta-row"><div class="meta-label">稼働日数</div><div class="meta-val">週2日</div></div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">3/20</div></div>
+          </div>
+          <button class="action-btn primary">チャットを開く</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 面談調整中 ── -->
+    <div class="section-sep">
+      <div class="section-sep-line"></div>
+      <div class="section-sep-text">🗓 面談調整中</div>
+      <div class="section-sep-line"></div>
+    </div>
+
+    <!-- Card: interview -->
+    <div class="acard" data-status="interview">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-interview);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#ee0979,#ff6a00);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">プロダクトマネージャー（0→1フェーズ）</div>
+              <div class="acard-company">株式会社MNO</div>
+            </div>
+            <div class="status-badge sb-interview">
+              <span class="sdot" style="background:var(--s-interview);"></span>
+              面談調整中
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">PM</span>
+            <span class="atag">スタートアップ</span>
+            <span class="atag">0→1</span>
+            <span class="atag">フルリモート</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">書類選考</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step active"><div class="tl-dot active"></div><span class="tl-label">面談日程調整</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">条件確認</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">面談候補日</div><div class="meta-val accent">4/5・6・7</div></div>
+            <div class="meta-row"><div class="meta-label">形式</div><div class="meta-val">オンライン</div></div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">3/30</div></div>
+          </div>
+          <button class="action-btn primary">日程を確認</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 選考中 ── -->
+    <div class="section-sep">
+      <div class="section-sep-line"></div>
+      <div class="section-sep-text">🔍 選考中</div>
+      <div class="section-sep-line"></div>
+    </div>
+
+    <!-- Card: reviewing 1 -->
+    <div class="acard" data-status="reviewing">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-reviewing);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#FF9A3C,#FF6B6B,#C44DFF);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">AI案件自動登録システムのChatGPTテスト参加者</div>
+              <div class="acard-company">株式会社プレスマン</div>
+            </div>
+            <div class="status-badge sb-reviewing">
+              <span class="sdot" style="background:var(--s-reviewing);"></span>
+              選考中
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">ChatGPT</span>
+            <span class="atag">AI</span>
+            <span class="atag">SaaS</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">書類選考</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step active"><div class="tl-dot active"></div><span class="tl-label">書類審査中</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">面談</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">3/29</div></div>
+            <div class="meta-row"><div class="meta-label">結果予定</div><div class="meta-val">4/5頃</div></div>
+            <div class="meta-row"><div class="meta-label">マッチ度</div><div class="meta-val accent">82%</div></div>
+          </div>
+          <button class="action-btn">詳細を見る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card: reviewing 2 -->
+    <div class="acard" data-status="reviewing">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-reviewing);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#0f2027,#203a43,#2c5364);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">フロントエンドエンジニア（React / TypeScript）</div>
+              <div class="acard-company">株式会社GHI</div>
+            </div>
+            <div class="status-badge sb-reviewing">
+              <span class="sdot" style="background:var(--s-reviewing);"></span>
+              選考中
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">React</span>
+            <span class="atag">TypeScript</span>
+            <span class="atag">フルリモート</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">書類選考</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step done"><div class="tl-dot done"></div><span class="tl-label">1次面談</span></div>
+            <div class="tl-line done"></div>
+            <div class="tl-step active"><div class="tl-dot active"></div><span class="tl-label">2次面談待ち</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">3/25</div></div>
+            <div class="meta-row"><div class="meta-label">次のステップ</div><div class="meta-val accent">2次面談</div></div>
+            <div class="meta-row"><div class="meta-label">マッチ度</div><div class="meta-val accent">78%</div></div>
+          </div>
+          <button class="action-btn">詳細を見る</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── 応募済み ── -->
+    <div class="section-sep">
+      <div class="section-sep-line"></div>
+      <div class="section-sep-text">📬 応募済み（結果待ち）</div>
+      <div class="section-sep-line"></div>
+    </div>
+
+    <!-- Card: applied -->
+    <div class="acard" data-status="applied">
+      <div class="acard-main">
+        <div class="acard-stripe" style="background:var(--s-applied);"></div>
+        <div class="acard-thumb"><div class="tbg" style="background:linear-gradient(135deg,#43CEA2,#185A9D);"></div></div>
+        <div class="acard-body">
+          <div class="acard-top">
+            <div class="acard-info">
+              <div class="acard-role">採用担当（新卒・中途）人材業務</div>
+              <div class="acard-company">株式会社ABC</div>
+            </div>
+            <div class="status-badge sb-applied">
+              <span class="sdot" style="background:var(--s-applied);"></span>
+              応募済み
+            </div>
+          </div>
+          <div class="acard-tags">
+            <span class="atag">採用</span>
+            <span class="atag">HR</span>
+            <span class="atag">週3以下</span>
+            <span class="atag">大阪</span>
+          </div>
+          <div class="acard-timeline">
+            <div class="tl-step active"><div class="tl-dot active"></div><span class="tl-label">書類確認中</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">面談</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">条件確認</span></div>
+            <div class="tl-line"></div>
+            <div class="tl-step"><div class="tl-dot pending"></div><span class="tl-label">確定</span></div>
+          </div>
+        </div>
+        <div class="acard-meta">
+          <div>
+            <div class="meta-row"><div class="meta-label">応募日</div><div class="meta-val">4/1</div></div>
+            <div class="meta-row"><div class="meta-label">締切</div><div class="meta-val accent">4/10</div></div>
+            <div class="meta-row"><div class="meta-label">マッチ度</div><div class="meta-val">65%</div></div>
+          </div>
+          <button class="action-btn">詳細を見る</button>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+  function filterStatus(el, status) {
+    document.querySelectorAll('.s-chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    document.querySelectorAll('.acard').forEach(card => {
+      const s = card.dataset.status;
+      card.style.display = (status === 'all' || s === status) ? '' : 'none';
+    });
+    document.querySelectorAll('.section-sep').forEach(sep => {
+      sep.style.display = status === 'all' ? '' : 'none';
+    });
+  }
+</script>
+</body>
+</html>

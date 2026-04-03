@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK — 募集管理</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #F7F8FA;
+      --surface: #FFFFFF;
+      --border:  #E5E7EB;
+      --border2: #D1D5DB;
+      --text:    #111827;
+      --text2:   #6B7280;
+      --text3:   #9CA3AF;
+      --accent:  #0D9488;
+      --navy:    #1A2340;
+      --sidebar: #1A2340;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); font-size:13px; min-height:100vh; display:flex; }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      width:220px; flex-shrink:0;
+      background:var(--sidebar);
+      min-height:100vh;
+      display:flex; flex-direction:column;
+      position:fixed; top:0; left:0; bottom:0;
+    }
+    .sidebar-logo {
+      padding:20px 20px 16px;
+      border-bottom:1px solid rgba(255,255,255,0.07);
+    }
+    .logo-text { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; color:white; }
+    .logo-text span { color:#FF9870; }
+    .logo-sub { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-top:3px; }
+    .sidebar-nav { padding:12px 10px; flex:1; }
+    .nav-section-label { font-size:9px; font-weight:700; color:rgba(255,255,255,0.25); letter-spacing:1.5px; text-transform:uppercase; padding:0 10px; margin:16px 0 6px; }
+    .nav-section-label:first-child { margin-top:4px; }
+    .nav-item {
+      display:flex; align-items:center; gap:10px;
+      padding:9px 12px; border-radius:8px; cursor:pointer;
+      color:rgba(255,255,255,0.5); font-size:13px;
+      transition:all 0.15s; margin-bottom:2px;
+    }
+    .nav-item:hover { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.85); }
+    .nav-item.active { background:rgba(13,148,136,0.15); color:white; }
+    .nav-item.active .nav-icon { color:#FF9870; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; flex-shrink:0; }
+    .nav-badge { margin-left:auto; background:var(--accent); color:white; font-size:9px; font-weight:700; padding:1px 6px; border-radius:10px; }
+    .sidebar-user {
+      padding:14px 16px;
+      border-top:1px solid rgba(255,255,255,0.07);
+      display:flex; align-items:center; gap:10px;
+    }
+    .user-av { width:30px; height:30px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; flex-shrink:0; }
+    .user-info .user-name { font-size:12px; font-weight:500; color:white; }
+    .user-info .user-role { font-size:10px; color:rgba(255,255,255,0.35); }
+
+    /* ── MAIN ── */
+    .main { margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+
+    /* topbar */
+    .topbar {
+      height:52px; background:var(--surface);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 28px;
+      gap:12px; flex-shrink:0;
+    }
+    .topbar-title { font-size:15px; font-weight:700; flex:1; }
+    .topbar-btn {
+      display:flex; align-items:center; gap:6px;
+      padding:8px 18px; border-radius:8px;
+      font-size:13px; font-weight:700; font-family:inherit;
+      cursor:pointer; border:none; transition:all 0.15s;
+    }
+    .btn-primary { background:var(--accent); color:white; }
+    .btn-primary:hover { background:#0F766E; }
+    .btn-ghost { background:none; border:1.5px solid var(--border2); color:var(--text2); }
+    .btn-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* content */
+    .content { padding:24px 28px; flex:1; }
+
+    /* stats */
+    .stats { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:24px; }
+    .stat-card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:10px; padding:16px 18px;
+    }
+    .stat-label { font-size:11px; color:var(--text3); font-weight:700; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:8px; }
+    .stat-val { font-family:'Inter',sans-serif; font-size:26px; font-weight:800; color:var(--text); line-height:1; }
+    .stat-sub { font-size:11px; color:var(--text3); margin-top:4px; }
+    .stat-card.accent { border-left:3px solid var(--accent); }
+    .stat-card.green { border-left:3px solid #1DB954; }
+    .stat-card.blue { border-left:3px solid #3B82F6; }
+    .stat-card.gray { border-left:3px solid var(--border2); }
+
+    /* filter bar */
+    .filter-bar {
+      display:flex; align-items:center; gap:8px; margin-bottom:16px;
+    }
+    .filter-tab {
+      padding:6px 14px; border-radius:6px;
+      font-size:12px; font-weight:500; cursor:pointer;
+      color:var(--text2); transition:all 0.12s;
+      border:1px solid transparent;
+    }
+    .filter-tab:hover { color:var(--text); }
+    .filter-tab.on { background:var(--surface); border-color:var(--border); color:var(--text); font-weight:700; }
+    .filter-sep { flex:1; }
+    .search-input {
+      display:flex; align-items:center;
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:8px; padding:0 12px; gap:6px;
+    }
+    .search-input input { border:none; outline:none; font-size:12px; font-family:inherit; color:var(--text); background:none; padding:7px 0; width:180px; }
+    .search-input input::placeholder { color:var(--text3); }
+
+    /* table */
+    .table-wrap { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    table { width:100%; border-collapse:collapse; }
+    thead th {
+      text-align:left; padding:11px 16px;
+      font-size:11px; font-weight:700; color:var(--text3);
+      text-transform:uppercase; letter-spacing:0.5px;
+      background:#FAFAFA; border-bottom:1px solid var(--border);
+    }
+    tbody tr { border-bottom:1px solid var(--border); transition:background 0.12s; cursor:pointer; }
+    tbody tr:last-child { border-bottom:none; }
+    tbody tr:hover { background:#FAFAFA; }
+    td { padding:13px 16px; vertical-align:middle; }
+
+    .job-title-cell { display:flex; align-items:center; gap:10px; }
+    .job-thumb { width:34px; height:34px; border-radius:7px; flex-shrink:0; }
+    .job-name { font-size:13px; font-weight:700; color:var(--text); }
+    .job-meta { font-size:11px; color:var(--text3); margin-top:1px; }
+
+    .status-pill {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:3px 10px; border-radius:20px;
+      font-size:11px; font-weight:700;
+    }
+    .s-dot { width:5px; height:5px; border-radius:50%; }
+    .sp-active { background:#ECFDF5; color:#059669; }
+    .sp-draft  { background:#F9FAFB; color:#9CA3AF; border:1px solid var(--border); }
+    .sp-closed { background:#FEF2F2; color:#EF4444; }
+    .sp-paused { background:#FFFBEB; color:#D97706; }
+
+    .count-cell { font-family:'Inter',sans-serif; font-size:14px; font-weight:700; color:var(--text); }
+    .count-sub { font-size:10px; color:var(--text3); font-weight:400; font-family:'Noto Sans JP',sans-serif; }
+
+    .action-cell { display:flex; gap:6px; }
+    .row-btn {
+      padding:5px 12px; border-radius:6px;
+      font-size:11px; font-weight:700; font-family:inherit;
+      cursor:pointer; border:1px solid var(--border); background:none;
+      color:var(--text2); transition:all 0.12s;
+    }
+    .row-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .row-btn.primary { background:var(--accent); border-color:var(--accent); color:white; }
+
+    .empty-row td { text-align:center; padding:40px; color:var(--text3); }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">P<span>A</span>RK</div>
+    <div class="logo-sub">RECRUITER</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">メイン</div>
+    <div class="nav-item active">
+      <span class="nav-icon">📋</span> 募集管理
+    </div>
+    <div class="nav-item" onclick="location.href='create.html'">
+      <span class="nav-icon">＋</span> 案件を作成
+    </div>
+    <div class="nav-item" onclick="location.href='search.html'">
+      <span class="nav-icon">🔍</span> 人材を探す
+    </div>
+    <div class="nav-section-label">コミュニケーション</div>
+    <div class="nav-item">
+      <span class="nav-icon">💬</span> チャット
+      <span class="nav-badge">5</span>
+    </div>
+    <div class="nav-item">
+      <span class="nav-icon">🔔</span> 通知
+      <span class="nav-badge">3</span>
+    </div>
+    <div class="nav-section-label">設定</div>
+    <div class="nav-item">
+      <span class="nav-icon">⚙️</span> 各種設定
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-av">管</div>
+    <div class="user-info">
+      <div class="user-name">管理者 太郎</div>
+      <div class="user-role">株式会社プレスマン</div>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">募集管理</div>
+    <button class="topbar-btn btn-ghost">CSVエクスポート</button>
+    <button class="topbar-btn btn-primary" onclick="location.href='create.html'">＋ 案件を作成</button>
+  </div>
+
+  <div class="content">
+    <!-- stats -->
+    <div class="stats">
+      <div class="stat-card accent">
+        <div class="stat-label">公開中</div>
+        <div class="stat-val">3</div>
+        <div class="stat-sub">募集受付中</div>
+      </div>
+      <div class="stat-card blue">
+        <div class="stat-label">今週の応募</div>
+        <div class="stat-val">12</div>
+        <div class="stat-sub">前週比 +4</div>
+      </div>
+      <div class="stat-card green">
+        <div class="stat-label">確定済み</div>
+        <div class="stat-val">7</div>
+        <div class="stat-sub">今月</div>
+      </div>
+      <div class="stat-card gray">
+        <div class="stat-label">下書き</div>
+        <div class="stat-val">2</div>
+        <div class="stat-sub">未公開</div>
+      </div>
+    </div>
+
+    <!-- filter -->
+    <div class="filter-bar">
+      <div class="filter-tab on" onclick="switchTab(this)">すべて (7)</div>
+      <div class="filter-tab" onclick="switchTab(this)">公開中 (3)</div>
+      <div class="filter-tab" onclick="switchTab(this)">一時停止 (1)</div>
+      <div class="filter-tab" onclick="switchTab(this)">募集終了 (1)</div>
+      <div class="filter-tab" onclick="switchTab(this)">下書き (2)</div>
+      <div class="filter-sep"></div>
+      <div class="search-input">
+        <span style="color:var(--text3);font-size:12px;">🔍</span>
+        <input type="text" placeholder="案件名で検索">
+      </div>
+    </div>
+
+    <!-- table -->
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th style="width:36%;">案件名</th>
+            <th style="width:10%;">ステータス</th>
+            <th style="width:8%;">応募数</th>
+            <th style="width:8%;">確定数</th>
+            <th style="width:10%;">公開日</th>
+            <th style="width:10%;">締切</th>
+            <th style="width:18%;">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr onclick="location.href='search.html'">
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:linear-gradient(135deg,#a18cd1,#fbc2eb);"></div>
+                <div>
+                  <div class="job-name">UIデザイナー（週3〜、フルリモート可）</div>
+                  <div class="job-meta">デザイン・Figma・UI/UX</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-active"><span class="s-dot" style="background:#059669;"></span>公開中</span></td>
+            <td><div class="count-cell">14<div class="count-sub">名が応募</div></div></td>
+            <td><div class="count-cell">2<div class="count-sub">名が確定</div></div></td>
+            <td style="font-size:12px;color:var(--text2);">3/25</td>
+            <td style="font-size:12px;color:var(--accent);font-weight:700;">4/10</td>
+            <td><div class="action-cell">
+              <button class="row-btn" onclick="event.stopPropagation()">編集</button>
+              <button class="row-btn primary" onclick="event.stopPropagation(); location.href='search.html'">応募者を見る</button>
+            </div></td>
+          </tr>
+          <tr onclick="location.href='search.html'">
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:linear-gradient(135deg,#FF9A3C,#FF6B6B);"></div>
+                <div>
+                  <div class="job-name">AI案件自動登録システム・ChatGPTテスト参加者</div>
+                  <div class="job-meta">ChatGPT・AI・SaaS</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-active"><span class="s-dot" style="background:#059669;"></span>公開中</span></td>
+            <td><div class="count-cell">8<div class="count-sub">名が応募</div></div></td>
+            <td><div class="count-cell">1<div class="count-sub">名が確定</div></div></td>
+            <td style="font-size:12px;color:var(--text2);">3/14</td>
+            <td style="font-size:12px;color:var(--accent);font-weight:700;">4/5</td>
+            <td><div class="action-cell">
+              <button class="row-btn" onclick="event.stopPropagation()">編集</button>
+              <button class="row-btn primary" onclick="event.stopPropagation(); location.href='search.html'">応募者を見る</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:linear-gradient(135deg,#56ab2f,#a8e063);"></div>
+                <div>
+                  <div class="job-name">SNSマーケター（Instagram・TikTok）</div>
+                  <div class="job-meta">SNS運用・マーケティング</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-active"><span class="s-dot" style="background:#059669;"></span>公開中</span></td>
+            <td><div class="count-cell">5<div class="count-sub">名が応募</div></div></td>
+            <td><div class="count-cell">0<div class="count-sub">名が確定</div></div></td>
+            <td style="font-size:12px;color:var(--text2);">3/28</td>
+            <td style="font-size:12px;color:var(--text2);">4/20</td>
+            <td><div class="action-cell">
+              <button class="row-btn">編集</button>
+              <button class="row-btn primary" onclick="location.href='search.html'">応募者を見る</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:linear-gradient(135deg,#4facfe,#00f2fe);"></div>
+                <div>
+                  <div class="job-name">フロントエンドエンジニア（React/TypeScript）</div>
+                  <div class="job-meta">React・TypeScript・フルリモート</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-paused"><span class="s-dot" style="background:#D97706;"></span>一時停止</span></td>
+            <td><div class="count-cell">21<div class="count-sub">名が応募</div></div></td>
+            <td><div class="count-cell">4<div class="count-sub">名が確定</div></div></td>
+            <td style="font-size:12px;color:var(--text2);">2/10</td>
+            <td style="font-size:12px;color:var(--text2);">—</td>
+            <td><div class="action-cell">
+              <button class="row-btn">再開</button>
+              <button class="row-btn">詳細</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:linear-gradient(135deg,#ee0979,#ff6a00);"></div>
+                <div>
+                  <div class="job-name">プロダクトマネージャー（0→1フェーズ）</div>
+                  <div class="job-meta">PM・スタートアップ</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-closed"><span class="s-dot" style="background:#EF4444;"></span>募集終了</span></td>
+            <td><div class="count-cell">18<div class="count-sub">名が応募</div></div></td>
+            <td><div class="count-cell">3<div class="count-sub">名が確定</div></div></td>
+            <td style="font-size:12px;color:var(--text2);">1/15</td>
+            <td style="font-size:12px;color:var(--text2);">3/15</td>
+            <td><div class="action-cell">
+              <button class="row-btn">複製</button>
+              <button class="row-btn">詳細</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:#F3F4F6; border:1px solid var(--border);"></div>
+                <div>
+                  <div class="job-name">データアナリスト（機械学習・BI構築）</div>
+                  <div class="job-meta">Python・データ分析</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-draft"><span class="s-dot" style="background:#9CA3AF;"></span>下書き</span></td>
+            <td><div class="count-cell" style="color:var(--text3);">—</div></td>
+            <td><div class="count-cell" style="color:var(--text3);">—</div></td>
+            <td style="font-size:12px;color:var(--text3);">未公開</td>
+            <td style="font-size:12px;color:var(--text3);">—</td>
+            <td><div class="action-cell">
+              <button class="row-btn">編集</button>
+              <button class="row-btn primary">公開する</button>
+            </div></td>
+          </tr>
+          <tr>
+            <td>
+              <div class="job-title-cell">
+                <div class="job-thumb" style="background:#F3F4F6; border:1px solid var(--border);"></div>
+                <div>
+                  <div class="job-name">テックライター（英日・週2〜）</div>
+                  <div class="job-meta">コンテンツ・ライター</div>
+                </div>
+              </div>
+            </td>
+            <td><span class="status-pill sp-draft"><span class="s-dot" style="background:#9CA3AF;"></span>下書き</span></td>
+            <td><div class="count-cell" style="color:var(--text3);">—</div></td>
+            <td><div class="count-cell" style="color:var(--text3);">—</div></td>
+            <td style="font-size:12px;color:var(--text3);">未公開</td>
+            <td style="font-size:12px;color:var(--text3);">—</td>
+            <td><div class="action-cell">
+              <button class="row-btn">編集</button>
+              <button class="row-btn primary">公開する</button>
+            </div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  function switchTab(el) {
+    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('on'));
+    el.classList.add('on');
+  }
+</script>
+</body>
+</html>

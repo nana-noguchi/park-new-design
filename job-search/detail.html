@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK — UIデザイナー 案件詳細</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:      #F4F2EF;
+      --surface: #FFFFFF;
+      --border:  rgba(0,0,0,0.07);
+      --border2: rgba(0,0,0,0.13);
+      --text:    #1A1A1A;
+      --text2:   #666;
+      --text3:   #AAA;
+      --accent:  #FF5D3D;
+      --navy:    #1a2340;
+      --green:   #1DB954;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); font-size:13px; min-height:100vh; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      position:fixed; top:0; left:0; right:0; z-index:100;
+      height:52px; background:rgba(255,255,255,0.9); backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--border);
+      display:flex; align-items:center; padding:0 24px; gap:16px;
+    }
+    .logo { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; color:#1A1A1A; flex-shrink:0; }
+    .logo span { color:var(--accent); }
+    .topbar-sep { width:1px; height:20px; background:var(--border2); }
+    .crumb { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text2); }
+    .crumb .link { cursor:pointer; transition:color 0.15s; }
+    .crumb .link:hover { color:var(--accent); }
+    .crumb .cur { color:var(--text); font-weight:500; }
+    .topbar-right { margin-left:auto; display:flex; align-items:center; gap:10px; }
+    .tnav { padding:6px 12px; border-radius:8px; font-size:12px; color:var(--text2); cursor:pointer; transition:all 0.15s; display:flex; align-items:center; gap:5px; }
+    .tnav:hover { background:var(--surface); color:var(--text); }
+    .tnav.active { color:var(--text); background:var(--surface); }
+    .tnav .nbadge { background:var(--accent); color:white; font-size:9px; font-weight:700; padding:1px 5px; border-radius:8px; }
+    .user-pill { display:flex; align-items:center; gap:8px; background:var(--surface); border:1px solid var(--border2); border-radius:24px; padding:4px 12px 4px 4px; cursor:pointer; }
+    .uavatar { width:26px; height:26px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:white; }
+    .uname { font-size:12px; color:var(--text2); }
+
+    /* ── LAYOUT ── */
+    .layout {
+      max-width:1100px; margin:0 auto;
+      padding:72px 24px 80px;
+      display:flex; gap:28px; align-items:flex-start;
+    }
+
+    /* ── MAIN ── */
+    .main { flex:1; min-width:0; }
+
+    /* hero */
+    .hero {
+      background:var(--navy); border-radius:16px;
+      padding:28px 32px; margin-bottom:20px;
+      position:relative; overflow:hidden;
+    }
+    .hero::after {
+      content:''; position:absolute; right:-40px; top:-40px;
+      width:220px; height:220px; border-radius:50%;
+      background:radial-gradient(circle,rgba(255,93,61,0.2) 0%,transparent 70%);
+      pointer-events:none;
+    }
+    .hero-top { display:flex; align-items:flex-start; gap:18px; margin-bottom:16px; }
+    .hero-thumb {
+      width:60px; height:60px; border-radius:12px; flex-shrink:0;
+      background:linear-gradient(135deg,#a18cd1,#fbc2eb);
+    }
+    .hero-info { flex:1; }
+    .hero-role { font-family:'Inter',sans-serif; font-size:22px; font-weight:800; color:white; line-height:1.3; margin-bottom:6px; }
+    .hero-company { font-size:13px; color:rgba(255,255,255,0.55); display:flex; align-items:center; gap:8px; }
+    .live-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    .hero-actions { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .fav-pill {
+      display:flex; align-items:center; gap:6px;
+      background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2);
+      color:white; padding:8px 14px; border-radius:10px;
+      font-size:13px; cursor:pointer; transition:all 0.15s;
+    }
+    .fav-pill:hover { background:rgba(255,255,255,0.15); }
+    .fav-pill.on { background:rgba(231,76,60,0.2); border-color:rgba(231,76,60,0.4); }
+
+    .hero-tags { display:flex; gap:6px; flex-wrap:wrap; }
+    .htag { padding:4px 10px; border-radius:6px; background:rgba(255,255,255,0.1); color:rgba(255,255,255,0.75); font-size:11px; }
+    .htag.accent { background:rgba(255,93,61,0.25); color:#FF5D3D; }
+
+    /* conditions row */
+    .conditions {
+      display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin-bottom:20px;
+    }
+    .cond-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:12px;
+      padding:14px 16px;
+    }
+    .cond-label { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:5px; }
+    .cond-val { font-size:15px; font-weight:700; color:var(--text); }
+    .cond-sub { font-size:11px; color:var(--text2); margin-top:2px; }
+
+    /* section card */
+    .scard { background:var(--surface); border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; }
+    .scard-head { padding:16px 22px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:10px; }
+    .scard-icon { width:28px; height:28px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:14px; flex-shrink:0; }
+    .scard-title { font-size:14px; font-weight:700; }
+    .scard-body { padding:20px 22px; }
+
+    /* prose */
+    .prose { font-size:13px; color:var(--text2); line-height:1.9; }
+    .prose p { margin-bottom:12px; }
+    .prose p:last-child { margin-bottom:0; }
+
+    /* req list */
+    .req-section { margin-bottom:20px; }
+    .req-section:last-child { margin-bottom:0; }
+    .req-label { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:10px; }
+    .req-list { display:flex; flex-direction:column; gap:6px; }
+    .req-item { display:flex; align-items:flex-start; gap:8px; font-size:13px; color:var(--text2); line-height:1.5; }
+    .req-dot { width:6px; height:6px; border-radius:50%; margin-top:6px; flex-shrink:0; }
+    .req-dot.must { background:var(--accent); }
+    .req-dot.want { background:var(--border2); }
+
+    /* process */
+    .process { display:flex; align-items:flex-start; gap:0; }
+    .proc-step { flex:1; text-align:center; position:relative; }
+    .proc-step:last-child { flex:0 0 auto; }
+    .proc-line {
+      flex:1; height:2px; background:var(--border2);
+      position:absolute; top:14px; left:50%; right:-50%;
+    }
+    .proc-step:last-child .proc-line { display:none; }
+    .proc-num {
+      width:28px; height:28px; border-radius:50%;
+      background:var(--bg); border:2px solid var(--border2);
+      display:flex; align-items:center; justify-content:center;
+      font-size:11px; font-weight:700; color:var(--text3);
+      margin:0 auto 8px; position:relative; z-index:1;
+    }
+    .proc-step.active .proc-num { background:var(--accent); border-color:var(--accent); color:white; }
+    .proc-label { font-size:11px; color:var(--text2); white-space:nowrap; }
+    .proc-step.active .proc-label { color:var(--accent); font-weight:700; }
+
+    /* company */
+    .company-row { display:flex; align-items:center; gap:14px; margin-bottom:16px; }
+    .company-logo {
+      width:48px; height:48px; border-radius:10px; flex-shrink:0;
+      background:linear-gradient(135deg,#a18cd1,#fbc2eb);
+    }
+    .company-name { font-size:15px; font-weight:700; margin-bottom:3px; }
+    .company-industry { font-size:12px; color:var(--text2); }
+    .company-stats { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-top:14px; }
+    .cs { background:var(--bg); border-radius:8px; padding:10px 12px; text-align:center; }
+    .cs-val { font-size:16px; font-weight:700; color:var(--text); }
+    .cs-label { font-size:10px; color:var(--text3); margin-top:2px; }
+
+    /* ── SIDEBAR ── */
+    .aside { width:260px; flex-shrink:0; position:sticky; top:72px; display:flex; flex-direction:column; gap:14px; }
+
+    .apply-card {
+      background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:20px;
+    }
+    .match-row { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+    .match-circle {
+      width:56px; height:56px; border-radius:50%; flex-shrink:0;
+      background:conic-gradient(var(--green) 0% 91%, var(--border2) 91%);
+      display:flex; align-items:center; justify-content:center; position:relative;
+    }
+    .match-circle::before {
+      content:''; position:absolute; width:44px; height:44px; border-radius:50%; background:white;
+    }
+    .match-val { position:relative; z-index:1; font-size:13px; font-weight:800; color:var(--green); }
+    .match-info { flex:1; }
+    .match-title { font-size:13px; font-weight:700; margin-bottom:3px; }
+    .match-sub { font-size:11px; color:var(--text2); line-height:1.5; }
+
+    .apply-main-btn {
+      display:block; width:100%; padding:14px;
+      background:var(--accent); color:white; border:none;
+      border-radius:12px; font-size:15px; font-weight:700;
+      font-family:inherit; cursor:pointer; text-align:center;
+      transition:all 0.15s; margin-bottom:8px;
+      box-shadow:0 4px 14px rgba(255,93,61,0.3);
+    }
+    .apply-main-btn:hover { background:#c9430e; box-shadow:0 6px 18px rgba(255,93,61,0.4); transform:translateY(-1px); }
+    .save-btn {
+      display:block; width:100%; padding:11px;
+      background:none; border:1.5px solid var(--border2);
+      border-radius:12px; font-size:13px; font-weight:700;
+      font-family:inherit; color:var(--text2); cursor:pointer;
+      transition:all 0.15s; text-align:center;
+    }
+    .save-btn:hover { border-color:var(--accent); color:var(--accent); }
+    .apply-note { font-size:11px; color:var(--text3); text-align:center; margin-top:10px; line-height:1.5; }
+
+    .aside-card { background:var(--surface); border:1px solid var(--border); border-radius:14px; padding:18px; }
+    .aside-title { font-size:10px; font-weight:700; color:var(--text3); letter-spacing:1.5px; text-transform:uppercase; margin-bottom:14px; }
+    .info-row { display:flex; align-items:center; justify-content:space-between; padding:9px 0; border-bottom:1px solid var(--border); }
+    .info-row:last-child { border-bottom:none; padding-bottom:0; }
+    .info-label { font-size:12px; color:var(--text2); }
+    .info-val { font-size:12px; font-weight:700; color:var(--text); }
+    .info-val.accent { color:var(--accent); }
+    .info-val.green { color:var(--green); }
+
+    .poster-card { display:flex; align-items:center; gap:12px; }
+    .poster-avatar { width:40px; height:40px; border-radius:50%; background:#DDE; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:#556; flex-shrink:0; }
+    .poster-name { font-size:13px; font-weight:700; margin-bottom:2px; }
+    .poster-role { font-size:11px; color:var(--text2); }
+    .chat-btn {
+      margin-top:12px; width:100%; padding:9px;
+      background:none; border:1.5px solid var(--border2);
+      border-radius:10px; font-size:12px; font-weight:700;
+      font-family:inherit; color:var(--text2); cursor:pointer;
+      transition:all 0.15s;
+    }
+    .chat-btn:hover { border-color:var(--navy); color:var(--navy); }
+  </style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo">P<span>A</span>RK</div>
+  <div class="topbar-sep"></div>
+  <div class="crumb">
+    <span class="link" onclick="location.href='best.html'">案件一覧</span>
+    <span>›</span>
+    <span class="cur">UIデザイナー（週3〜、フルリモート可）</span>
+  </div>
+  <div class="topbar-right">
+    <div class="tnav" onclick="location.href='best.html'">案件</div>
+    <div class="tnav" onclick="location.href='applications.html'">応募 <span class="nbadge">3</span></div>
+    <div class="tnav">チャット <span class="nbadge">17</span></div>
+    <div class="user-pill">
+      <div class="uavatar">花</div>
+      <span class="uname">花子さん</span>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+
+  <!-- MAIN -->
+  <div class="main">
+
+    <!-- hero -->
+    <div class="hero">
+      <div class="hero-top">
+        <div class="hero-thumb"></div>
+        <div class="hero-info">
+          <div class="hero-role">UIデザイナー（週3〜、フルリモート可）</div>
+          <div class="hero-company">
+            <div class="live-dot"></div>
+            株式会社DEF ・ 渋谷区
+          </div>
+        </div>
+        <div class="hero-actions">
+          <div class="fav-pill" id="favBtn" onclick="toggleFav()">🤍 保存</div>
+        </div>
+      </div>
+      <div class="hero-tags">
+        <span class="htag accent">🎯 91% マッチ</span>
+        <span class="htag">Figma</span>
+        <span class="htag">UI/UX</span>
+        <span class="htag">フルリモート</span>
+        <span class="htag">週3〜</span>
+        <span class="htag">〜80万円/月</span>
+        <span class="htag">長期</span>
+      </div>
+    </div>
+
+    <!-- conditions -->
+    <div class="conditions">
+      <div class="cond-card">
+        <div class="cond-label">💰 単価</div>
+        <div class="cond-val">〜80万円</div>
+        <div class="cond-sub">月額・税別</div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-label">📅 稼働</div>
+        <div class="cond-val">週3〜5日</div>
+        <div class="cond-sub">フレキシブル相談可</div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-label">🏠 場所</div>
+        <div class="cond-val">フルリモート</div>
+        <div class="cond-sub">月1〜2回出社あり</div>
+      </div>
+      <div class="cond-card">
+        <div class="cond-label">📌 開始</div>
+        <div class="cond-val">即日〜</div>
+        <div class="cond-sub">4月中旬スタート歓迎</div>
+      </div>
+    </div>
+
+    <!-- 仕事内容 -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#FFF0EB;">📝</div>
+        <div class="scard-title">仕事内容</div>
+      </div>
+      <div class="scard-body">
+        <div class="prose">
+          <p>自社プロダクト「DEF Analytics」のUI/UXデザインを担当していただきます。現在、デザインシステムの構築フェーズにあり、0→1でプロダクトの体験をつくる重要なポジションです。</p>
+          <p>エンジニアやPMと密に連携しながら、ユーザーリサーチから画面設計・コンポーネント設計まで幅広くお任せします。フィードバックサイクルが早く、自分のデザインがすぐにプロダクトに反映される環境です。</p>
+          <p>週次でデザインレビューを行い、チーム全員でUI品質を高める文化があります。デザインの意思決定に積極的に関われるポジションです。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 求めるスキル -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#EEF2FF;">⚡</div>
+        <div class="scard-title">求めるスキル・経験</div>
+      </div>
+      <div class="scard-body">
+        <div class="req-section">
+          <div class="req-label">必須</div>
+          <div class="req-list">
+            <div class="req-item"><div class="req-dot must"></div>Figmaを用いたUI設計の実務経験（2年以上）</div>
+            <div class="req-item"><div class="req-dot must"></div>コンポーネント設計・デザインシステム構築の経験</div>
+            <div class="req-item"><div class="req-dot must"></div>エンジニアと連携して実装まで推進できるコミュニケーション力</div>
+            <div class="req-item"><div class="req-dot must"></div>ポートフォリオの提出（Figmaリンク or PDF）</div>
+          </div>
+        </div>
+        <div class="req-section" style="margin-top:20px;">
+          <div class="req-label">歓迎</div>
+          <div class="req-list">
+            <div class="req-item"><div class="req-dot want"></div>BtoBプロダクト・ダッシュボード系UIの設計経験</div>
+            <div class="req-item"><div class="req-dot want"></div>ユーザーインタビュー・ユーザビリティテストの経験</div>
+            <div class="req-item"><div class="req-dot want"></div>基本的なHTMLやCSS、Tailwindの理解</div>
+            <div class="req-item"><div class="req-dot want"></div>英語でのコミュニケーション（社内ドキュメントが一部英語）</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 選考フロー -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#F0FFF4;">🗺️</div>
+        <div class="scard-title">選考フロー</div>
+      </div>
+      <div class="scard-body">
+        <div class="process">
+          <div class="proc-step">
+            <div class="proc-num">1</div>
+            <div class="proc-label">書類選考</div>
+            <div class="proc-line"></div>
+          </div>
+          <div class="proc-step active">
+            <div class="proc-num">2</div>
+            <div class="proc-label">オンライン面談</div>
+            <div class="proc-line"></div>
+          </div>
+          <div class="proc-step">
+            <div class="proc-num">3</div>
+            <div class="proc-label">条件確認</div>
+            <div class="proc-line"></div>
+          </div>
+          <div class="proc-step">
+            <div class="proc-num">4</div>
+            <div class="proc-label">契約・開始</div>
+          </div>
+        </div>
+        <div style="margin-top:16px; font-size:12px; color:var(--text2); background:var(--bg); border-radius:8px; padding:12px 14px; line-height:1.7;">
+          ✉️ 書類選考は3営業日以内に結果をご連絡します。面談は30〜45分、オンライン（Google Meet）で実施します。
+        </div>
+      </div>
+    </div>
+
+    <!-- 会社情報 -->
+    <div class="scard">
+      <div class="scard-head">
+        <div class="scard-icon" style="background:#FFF8E1;">🏢</div>
+        <div class="scard-title">会社情報</div>
+      </div>
+      <div class="scard-body">
+        <div class="company-row">
+          <div class="company-logo"></div>
+          <div>
+            <div class="company-name">株式会社DEF</div>
+            <div class="company-industry">SaaS / データ分析ツール</div>
+          </div>
+        </div>
+        <div class="prose">
+          <p>2018年創業のSaaSスタートアップ。BtoB向けのデータ分析プラットフォーム「DEF Analytics」を展開。導入企業数は500社を超え、Series Bの資金調達を完了した成長フェーズの会社です。</p>
+        </div>
+        <div class="company-stats">
+          <div class="cs"><div class="cs-val">52名</div><div class="cs-label">従業員数</div></div>
+          <div class="cs"><div class="cs-val">2018年</div><div class="cs-label">設立</div></div>
+          <div class="cs"><div class="cs-val">500社+</div><div class="cs-label">導入実績</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /main -->
+
+  <!-- ASIDE -->
+  <div class="aside">
+
+    <!-- apply card -->
+    <div class="apply-card">
+      <div class="match-row">
+        <div class="match-circle"><span class="match-val">91%</span></div>
+        <div class="match-info">
+          <div class="match-title">あなたにマッチ</div>
+          <div class="match-sub">スキル・稼働条件が<br>高い確率で一致しています</div>
+        </div>
+      </div>
+      <button class="apply-main-btn" onclick="location.href='apply.html'">この案件に応募する →</button>
+      <button class="save-btn" id="saveBtn" onclick="toggleSave()">🤍 あとで見る</button>
+      <div class="apply-note">応募後も取り下げできます<br>締切：<strong style="color:var(--accent)">4/10（木）</strong></div>
+    </div>
+
+    <!-- info -->
+    <div class="aside-card">
+      <div class="aside-title">案件情報</div>
+      <div class="info-row"><span class="info-label">公開日</span><span class="info-val">2026/03/25</span></div>
+      <div class="info-row"><span class="info-label">締切</span><span class="info-val accent">4/10（木）</span></div>
+      <div class="info-row"><span class="info-label">応募者数</span><span class="info-val">14名</span></div>
+      <div class="info-row"><span class="info-label">契約形態</span><span class="info-val">業務委託</span></div>
+      <div class="info-row"><span class="info-label">期間</span><span class="info-val">6ヶ月〜（更新あり）</span></div>
+    </div>
+
+    <!-- poster -->
+    <div class="aside-card">
+      <div class="aside-title">担当者</div>
+      <div class="poster-card">
+        <div class="poster-avatar">す</div>
+        <div>
+          <div class="poster-name">テスト すみれ</div>
+          <div class="poster-role">採用担当 / nicojo事業部</div>
+        </div>
+      </div>
+      <button class="chat-btn">💬 チャットで質問する</button>
+    </div>
+
+  </div><!-- /aside -->
+
+</div>
+
+<script>
+  function toggleFav() {
+    const btn = document.getElementById('favBtn');
+    const on = btn.classList.toggle('on');
+    btn.textContent = on ? '❤️ 保存済み' : '🤍 保存';
+  }
+  function toggleSave() {
+    const btn = document.getElementById('saveBtn');
+    const on = btn.textContent.includes('あとで');
+    btn.textContent = on ? '✅ 保存済み' : '🤍 あとで見る';
+  }
+</script>
+</body>
+</html>

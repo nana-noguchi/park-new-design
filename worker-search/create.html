@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK — 案件を作成</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#F7F8FA; --surface:#FFFFFF;
+      --border:#E5E7EB; --border2:#D1D5DB;
+      --text:#111827; --text2:#6B7280; --text3:#9CA3AF;
+      --accent:#0D9488; --navy:#1A2340;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); font-size:13px; min-height:100vh; display:flex; }
+
+    /* ── SIDEBAR (shared) ── */
+    .sidebar { width:220px; flex-shrink:0; background:var(--navy); min-height:100vh; display:flex; flex-direction:column; position:fixed; top:0; left:0; bottom:0; }
+    .sidebar-logo { padding:20px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.07); }
+    .logo-text { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; color:white; }
+    .logo-text span { color:#FF9870; }
+    .logo-sub { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-top:3px; }
+    .sidebar-nav { padding:12px 10px; flex:1; }
+    .nav-section-label { font-size:9px; font-weight:700; color:rgba(255,255,255,0.25); letter-spacing:1.5px; text-transform:uppercase; padding:0 10px; margin:16px 0 6px; }
+    .nav-section-label:first-child { margin-top:4px; }
+    .nav-item { display:flex; align-items:center; gap:10px; padding:9px 12px; border-radius:8px; cursor:pointer; color:rgba(255,255,255,0.5); font-size:13px; transition:all 0.15s; margin-bottom:2px; }
+    .nav-item:hover { background:rgba(255,255,255,0.06); color:rgba(255,255,255,0.85); }
+    .nav-item.active { background:rgba(13,148,136,0.15); color:white; }
+    .nav-item.active .nav-icon { color:#FF9870; }
+    .nav-icon { font-size:14px; width:18px; text-align:center; flex-shrink:0; }
+    .nav-badge { margin-left:auto; background:var(--accent); color:white; font-size:9px; font-weight:700; padding:1px 6px; border-radius:10px; }
+    .sidebar-user { padding:14px 16px; border-top:1px solid rgba(255,255,255,0.07); display:flex; align-items:center; gap:10px; }
+    .user-av { width:30px; height:30px; border-radius:50%; background:var(--accent); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:white; flex-shrink:0; }
+    .user-info .user-name { font-size:12px; font-weight:500; color:white; }
+    .user-info .user-role { font-size:10px; color:rgba(255,255,255,0.35); }
+
+    /* ── MAIN ── */
+    .main { margin-left:220px; flex:1; display:flex; flex-direction:column; min-height:100vh; }
+    .topbar { height:52px; background:var(--surface); border-bottom:1px solid var(--border); display:flex; align-items:center; padding:0 28px; gap:12px; flex-shrink:0; }
+    .topbar-back { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text2); cursor:pointer; transition:color 0.15s; margin-right:4px; }
+    .topbar-back:hover { color:var(--accent); }
+    .topbar-title { font-size:15px; font-weight:700; flex:1; }
+    .topbar-btn { display:flex; align-items:center; gap:6px; padding:8px 18px; border-radius:8px; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; border:none; transition:all 0.15s; }
+    .btn-primary { background:var(--accent); color:white; }
+    .btn-primary:hover { background:#0F766E; }
+    .btn-ghost { background:none; border:1.5px solid var(--border2); color:var(--text2); }
+    .btn-ghost:hover { border-color:var(--border2); color:var(--text); }
+
+    /* step bar */
+    .step-bar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 28px; display:flex; align-items:center; gap:0; height:44px; }
+    .step { display:flex; align-items:center; gap:8px; padding:0 16px 0 0; font-size:12px; color:var(--text3); cursor:pointer; }
+    .step:first-child { padding-left:0; }
+    .step-num { width:22px; height:22px; border-radius:50%; border:2px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:var(--text3); flex-shrink:0; }
+    .step.done .step-num { background:#1DB954; border-color:#1DB954; color:white; }
+    .step.active .step-num { background:var(--accent); border-color:var(--accent); color:white; }
+    .step.active { color:var(--text); font-weight:700; }
+    .step-arrow { color:var(--border2); margin-right:16px; font-size:12px; }
+
+    /* layout */
+    .content { padding:24px 28px 80px; display:flex; gap:20px; align-items:flex-start; }
+    .form-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:14px; }
+    .form-aside { width:240px; flex-shrink:0; position:sticky; top:24px; display:flex; flex-direction:column; gap:12px; }
+
+    /* section card */
+    .scard { background:var(--surface); border:1px solid var(--border); border-radius:10px; overflow:hidden; }
+    .scard-head { padding:14px 18px; border-bottom:1px solid var(--border); display:flex; align-items:center; gap:8px; }
+    .scard-title { font-size:13px; font-weight:700; }
+    .scard-req { font-size:10px; color:var(--accent); font-weight:700; margin-left:auto; }
+    .scard-body { padding:18px; }
+
+    /* form */
+    .fgroup { margin-bottom:16px; }
+    .fgroup:last-child { margin-bottom:0; }
+    .flabel { display:block; font-size:11px; font-weight:700; color:var(--text2); margin-bottom:5px; }
+    .flabel .req { color:var(--accent); margin-left:3px; }
+    .finput, .fselect, .ftextarea {
+      width:100%; padding:9px 12px;
+      background:var(--bg); border:1.5px solid var(--border2);
+      border-radius:8px; font-size:13px; font-family:inherit;
+      color:var(--text); outline:none; transition:border-color 0.15s;
+    }
+    .finput:focus, .fselect:focus, .ftextarea:focus { border-color:var(--accent); background:white; }
+    .ftextarea { resize:vertical; min-height:100px; line-height:1.7; }
+    .frow { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .frow-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .char-count { text-align:right; font-size:10px; color:var(--text3); margin-top:3px; }
+
+    /* tag input */
+    .tag-input-wrap {
+      display:flex; flex-wrap:wrap; gap:6px; align-items:center;
+      background:var(--bg); border:1.5px solid var(--border2);
+      border-radius:8px; padding:6px 10px; min-height:40px;
+      cursor:text; transition:border-color 0.15s;
+    }
+    .tag-input-wrap:focus-within { border-color:var(--accent); background:white; }
+    .tag-chip {
+      display:flex; align-items:center; gap:4px;
+      background:var(--surface); border:1px solid var(--border2);
+      border-radius:4px; padding:2px 8px; font-size:11px; color:var(--text);
+    }
+    .tag-chip button { background:none; border:none; color:var(--text3); cursor:pointer; font-size:11px; line-height:1; padding:0 0 0 2px; }
+    .tag-input-wrap input { border:none; outline:none; background:none; font-size:12px; font-family:inherit; color:var(--text); min-width:100px; }
+
+    /* toggle */
+    .toggle-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid var(--border); }
+    .toggle-row:last-child { border-bottom:none; }
+    .toggle-label { flex:1; }
+    .toggle-label strong { font-size:13px; font-weight:500; display:block; margin-bottom:2px; }
+    .toggle-label span { font-size:11px; color:var(--text3); }
+    .switch { position:relative; width:40px; height:22px; flex-shrink:0; }
+    .switch input { opacity:0; width:0; height:0; }
+    .slider { position:absolute; inset:0; background:#D1D5DB; border-radius:11px; cursor:pointer; transition:background 0.2s; }
+    .slider::before { content:''; position:absolute; width:16px; height:16px; left:3px; top:3px; background:white; border-radius:50%; transition:transform 0.2s; box-shadow:0 1px 3px rgba(0,0,0,0.2); }
+    .switch input:checked + .slider { background:var(--accent); }
+    .switch input:checked + .slider::before { transform:translateX(18px); }
+
+    /* aside */
+    .aside-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; }
+    .aside-title { font-size:11px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; }
+    .checklist { display:flex; flex-direction:column; gap:7px; }
+    .citem { display:flex; align-items:center; gap:8px; font-size:12px; color:var(--text2); }
+    .cmark { width:18px; height:18px; border-radius:50%; border:2px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:9px; flex-shrink:0; }
+    .cmark.done { background:#1DB954; border-color:#1DB954; color:white; }
+    .cmark.active { border-color:var(--accent); color:var(--accent); }
+
+    /* fixed save bar */
+    .save-bar { position:fixed; bottom:0; left:220px; right:0; background:rgba(255,255,255,0.95); backdrop-filter:blur(12px); border-top:1px solid var(--border); padding:12px 28px; display:flex; justify-content:flex-end; align-items:center; gap:10px; z-index:50; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">P<span>A</span>RK</div>
+    <div class="logo-sub">RECRUITER</div>
+  </div>
+  <nav class="sidebar-nav">
+    <div class="nav-section-label">メイン</div>
+    <div class="nav-item" onclick="location.href='index.html'"><span class="nav-icon">📋</span> 募集管理</div>
+    <div class="nav-item active"><span class="nav-icon">＋</span> 案件を作成</div>
+    <div class="nav-item" onclick="location.href='search.html'"><span class="nav-icon">🔍</span> 人材を探す</div>
+    <div class="nav-section-label">コミュニケーション</div>
+    <div class="nav-item"><span class="nav-icon">💬</span> チャット <span class="nav-badge">5</span></div>
+    <div class="nav-item"><span class="nav-icon">🔔</span> 通知 <span class="nav-badge">3</span></div>
+    <div class="nav-section-label">設定</div>
+    <div class="nav-item"><span class="nav-icon">⚙️</span> 各種設定</div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="user-av">管</div>
+    <div class="user-info">
+      <div class="user-name">管理者 太郎</div>
+      <div class="user-role">株式会社プレスマン</div>
+    </div>
+  </div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-back" onclick="location.href='index.html'">← 戻る</div>
+    <div class="topbar-title">案件を作成</div>
+    <button class="topbar-btn btn-ghost">下書き保存</button>
+    <button class="topbar-btn btn-primary" onclick="location.href='index.html'">公開する</button>
+  </div>
+
+  <div class="step-bar">
+    <div class="step done"><div class="step-num">✓</div> 基本情報</div>
+    <div class="step-arrow">›</div>
+    <div class="step active"><div class="step-num">2</div> 業務内容・スキル</div>
+    <div class="step-arrow">›</div>
+    <div class="step"><div class="step-num">3</div> 条件・公開設定</div>
+    <div class="step-arrow">›</div>
+    <div class="step"><div class="step-num">4</div> 確認・公開</div>
+  </div>
+
+  <div class="content">
+    <div class="form-main">
+
+      <!-- 基本情報 -->
+      <div class="scard">
+        <div class="scard-head">
+          <div class="scard-title">基本情報</div>
+          <div class="scard-req">必須</div>
+        </div>
+        <div class="scard-body">
+          <div class="fgroup">
+            <label class="flabel">案件タイトル <span class="req">*</span></label>
+            <input class="finput" type="text" value="UIデザイナー（週3〜、フルリモート可）">
+          </div>
+          <div class="frow fgroup">
+            <div>
+              <label class="flabel">カテゴリ <span class="req">*</span></label>
+              <select class="fselect">
+                <option>デザイン</option>
+                <option>IT・エンジニア</option>
+                <option>マーケティング</option>
+                <option>人事・採用</option>
+              </select>
+            </div>
+            <div>
+              <label class="flabel">サブカテゴリ</label>
+              <select class="fselect">
+                <option selected>UI/UXデザイン</option>
+                <option>グラフィックデザイン</option>
+                <option>Webデザイン</option>
+              </select>
+            </div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">スキルタグ</label>
+            <div class="tag-input-wrap" onclick="this.querySelector('input').focus()">
+              <div class="tag-chip">Figma <button onclick="this.parentElement.remove()">✕</button></div>
+              <div class="tag-chip">UI/UX <button onclick="this.parentElement.remove()">✕</button></div>
+              <div class="tag-chip">デザインシステム <button onclick="this.parentElement.remove()">✕</button></div>
+              <input type="text" placeholder="タグを追加" onkeydown="addTag(event,this)">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 業務内容 -->
+      <div class="scard">
+        <div class="scard-head"><div class="scard-title">業務内容</div><div class="scard-req">必須</div></div>
+        <div class="scard-body">
+          <div class="fgroup">
+            <label class="flabel">仕事内容 <span class="req">*</span></label>
+            <textarea class="ftextarea" style="min-height:140px;" id="desc" oninput="count('desc','dc',1000)">自社プロダクト「DEF Analytics」のUI/UXデザインを担当していただきます。現在、デザインシステムの構築フェーズにあり、0→1でプロダクトの体験をつくる重要なポジションです。
+
+エンジニアやPMと密に連携しながら、ユーザーリサーチから画面設計・コンポーネント設計まで幅広くお任せします。</textarea>
+            <div class="char-count" id="dc">0 / 1000文字</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 必須・歓迎スキル -->
+      <div class="scard">
+        <div class="scard-head"><div class="scard-title">求めるスキル・経験</div></div>
+        <div class="scard-body">
+          <div class="fgroup">
+            <label class="flabel">必須条件 <span class="req">*</span></label>
+            <textarea class="ftextarea" id="must" oninput="count('must','mc',500)" placeholder="例：Figmaを用いたUI設計の実務経験（2年以上）&#10;コンポーネント設計・デザインシステム構築の経験">Figmaを用いたUI設計の実務経験（2年以上）
+コンポーネント設計・デザインシステム構築の経験
+エンジニアと連携して実装まで推進できるコミュニケーション力
+ポートフォリオの提出必須</textarea>
+            <div class="char-count" id="mc">0 / 500文字</div>
+          </div>
+          <div class="fgroup">
+            <label class="flabel">歓迎条件</label>
+            <textarea class="ftextarea" id="want" oninput="count('want','wc',500)" placeholder="例：BtoBプロダクトの設計経験&#10;ユーザーインタビューの経験">BtoBプロダクト・ダッシュボード系UIの設計経験
+ユーザーインタビュー・ユーザビリティテストの経験
+基本的なHTML/CSSの理解</textarea>
+            <div class="char-count" id="wc">0 / 500文字</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 条件 -->
+      <div class="scard">
+        <div class="scard-head"><div class="scard-title">稼働条件</div><div class="scard-req">必須</div></div>
+        <div class="scard-body">
+          <div class="frow-3 fgroup">
+            <div>
+              <label class="flabel">単価（月額）<span class="req">*</span></label>
+              <input class="finput" type="text" value="〜80万円">
+            </div>
+            <div>
+              <label class="flabel">稼働日数 <span class="req">*</span></label>
+              <select class="fselect"><option>週3〜5日</option><option>週1〜2日</option><option>週5日</option><option>フレキシブル</option></select>
+            </div>
+            <div>
+              <label class="flabel">契約形態 <span class="req">*</span></label>
+              <select class="fselect"><option>業務委託</option><option>正社員</option><option>パート・アルバイト</option></select>
+            </div>
+          </div>
+          <div class="frow fgroup">
+            <div>
+              <label class="flabel">勤務地</label>
+              <input class="finput" type="text" value="フルリモート（月1〜2回出社）">
+            </div>
+            <div>
+              <label class="flabel">契約期間</label>
+              <input class="finput" type="text" value="6ヶ月〜（更新あり）">
+            </div>
+          </div>
+          <div class="frow fgroup">
+            <div>
+              <label class="flabel">開始時期</label>
+              <select class="fselect"><option>即日〜</option><option>1ヶ月以内</option><option>要相談</option></select>
+            </div>
+            <div>
+              <label class="flabel">募集締切</label>
+              <input class="finput" type="date" value="2026-04-10">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 公開設定 -->
+      <div class="scard">
+        <div class="scard-head"><div class="scard-title">公開設定</div></div>
+        <div class="scard-body">
+          <div class="toggle-row">
+            <div class="toggle-label"><strong>スカウト機能を有効にする</strong><span>マッチ度の高い候補者に自動でスカウトを送信します</span></div>
+            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label"><strong>ポイントを消費する</strong><span>スカウト送信時にポイントが消費されます</span></div>
+            <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-label"><strong>募集終了後も非表示にしない</strong><span>締切後もアーカイブとして閲覧可能な状態を維持します</span></div>
+            <label class="switch"><input type="checkbox"><span class="slider"></span></label>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /form-main -->
+
+    <!-- aside -->
+    <div class="form-aside">
+      <div class="aside-card">
+        <div class="aside-title">入力チェック</div>
+        <div class="checklist">
+          <div class="citem"><div class="cmark done">✓</div> 案件タイトル</div>
+          <div class="citem"><div class="cmark done">✓</div> カテゴリ</div>
+          <div class="citem"><div class="cmark active">2</div> 業務内容（入力中）</div>
+          <div class="citem"><div class="cmark">　</div> 必須条件</div>
+          <div class="citem"><div class="cmark">　</div> 稼働条件</div>
+          <div class="citem"><div class="cmark">　</div> 募集締切</div>
+        </div>
+      </div>
+      <div class="aside-card">
+        <div class="aside-title">ヒント</div>
+        <div style="font-size:12px; color:var(--text2); line-height:1.7;">
+          <strong style="color:var(--accent);">💡</strong> 業務内容を具体的に書くと、応募者とのミスマッチが減ります。<br><br>
+          スキルタグを5つ以上設定すると、AIマッチング精度が向上します。
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<div class="save-bar">
+  <button class="topbar-btn btn-ghost" onclick="location.href='index.html'">キャンセル</button>
+  <button class="topbar-btn btn-ghost">下書き保存</button>
+  <button class="topbar-btn btn-primary" onclick="location.href='index.html'">公開する →</button>
+</div>
+
+<script>
+  function count(id, cid, max) {
+    const len = document.getElementById(id).value.length;
+    const el = document.getElementById(cid);
+    el.textContent = len + ' / ' + max + '文字';
+    el.style.color = len > max * 0.9 ? 'var(--accent)' : 'var(--text3)';
+  }
+  function addTag(e, input) {
+    if (e.key === 'Enter' && input.value.trim()) {
+      const chip = document.createElement('div');
+      chip.className = 'tag-chip';
+      chip.innerHTML = input.value.trim() + ' <button onclick="this.parentElement.remove()">✕</button>';
+      input.parentNode.insertBefore(chip, input);
+      input.value = '';
+    }
+  }
+  // init counts
+  ['desc','must','want'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.dispatchEvent(new Event('input'));
+  });
+</script>
+</body>
+</html>

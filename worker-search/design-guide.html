@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PARK Recruiter — Design Guidelines</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:#F7F8FA; --surface:#FFFFFF;
+      --border:#E5E7EB; --border2:#D1D5DB;
+      --text:#111827; --text2:#6B7280; --text3:#9CA3AF;
+      --accent:#0D9488; --accent-d:#0F766E;
+      --navy:#1A2340;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body { font-family:'Noto Sans JP',sans-serif; background:var(--bg); color:var(--text); font-size:13px; display:flex; }
+
+    /* sidebar */
+    .sidebar { width:220px; flex-shrink:0; background:var(--navy); min-height:100vh; position:sticky; top:0; height:100vh; }
+    .sidebar-logo { padding:20px 20px 16px; border-bottom:1px solid rgba(255,255,255,0.07); }
+    .logo-text { font-family:'Inter',sans-serif; font-size:18px; font-weight:800; letter-spacing:3px; color:white; }
+    .logo-text span { color:#FF5D3D; }
+    .logo-sub { font-size:10px; color:rgba(255,255,255,0.3); letter-spacing:1px; margin-top:3px; }
+    .sidebar-label { font-size:9px; font-weight:700; color:rgba(255,255,255,0.25); letter-spacing:1.5px; text-transform:uppercase; padding:0 18px; margin:20px 0 8px; }
+    .sidebar-link { display:block; padding:8px 18px; font-size:12px; color:rgba(255,255,255,0.45); cursor:pointer; transition:color 0.15s; }
+    .sidebar-link:hover { color:rgba(255,255,255,0.8); }
+    .sidebar-link.active { color:white; font-weight:500; }
+
+    /* main */
+    .main { flex:1; min-width:0; }
+    .topbar { background:var(--surface); border-bottom:1px solid var(--border); padding:0 36px; height:52px; display:flex; align-items:center; justify-content:space-between; position:sticky; top:0; z-index:10; }
+    .topbar-title { font-family:'Inter',sans-serif; font-size:15px; font-weight:700; }
+    .topbar-badge { font-size:11px; color:var(--text3); }
+
+    .wrap { max-width:880px; margin:0 auto; padding:40px 36px 80px; }
+
+    /* page title */
+    .page-title { margin-bottom:40px; padding-bottom:20px; border-bottom:1px solid var(--border); }
+    .page-title h1 { font-family:'Inter',sans-serif; font-size:26px; font-weight:800; color:var(--text); margin-bottom:4px; }
+    .page-title h1 span { color:var(--accent); }
+    .page-title p { font-size:13px; color:var(--text2); }
+
+    /* section */
+    .section { margin-bottom:48px; }
+    .section-title {
+      font-size:10px; font-weight:700; color:var(--text3);
+      letter-spacing:2px; text-transform:uppercase;
+      margin-bottom:16px;
+      display:flex; align-items:center; gap:10px;
+    }
+    .section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+    /* card */
+    .g-card { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:20px; margin-bottom:10px; }
+    .g-card-label { font-size:11px; font-weight:700; color:var(--text3); margin-bottom:12px; text-transform:uppercase; letter-spacing:0.5px; }
+
+    /* color grid */
+    .color-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:10px; }
+    .color-item {}
+    .swatch { height:52px; border-radius:8px; margin-bottom:6px; border:1px solid rgba(0,0,0,0.05); }
+    .c-name { font-size:12px; font-weight:700; color:var(--text); margin-bottom:1px; }
+    .c-hex { font-family:'Inter',sans-serif; font-size:11px; color:var(--text3); }
+    .c-note { font-size:10px; color:var(--text3); margin-top:1px; }
+    .c-group { font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px; margin:18px 0 8px; }
+
+    /* type */
+    .type-row { display:flex; align-items:baseline; gap:16px; padding:12px 0; border-bottom:1px solid var(--border); }
+    .type-row:last-child { border-bottom:none; }
+    .type-meta { width:190px; flex-shrink:0; }
+    .type-label { font-size:11px; font-weight:700; color:var(--text3); margin-bottom:1px; }
+    .type-spec { font-family:'Inter',sans-serif; font-size:10px; color:var(--text2); }
+
+    /* radius */
+    .radius-row { display:flex; gap:14px; flex-wrap:wrap; align-items:flex-end; }
+    .ritem { text-align:center; }
+    .rbox { background:var(--navy); opacity:0.8; margin:0 auto 6px; }
+    .r-val { font-family:'Inter',sans-serif; font-size:11px; font-weight:700; color:var(--text); }
+    .r-use { font-size:10px; color:var(--text3); margin-top:1px; }
+
+    /* spacing */
+    .sp-list { display:flex; flex-direction:column; gap:8px; }
+    .sp-row { display:flex; align-items:center; gap:12px; }
+    .sp-bar { background:var(--accent); height:8px; border-radius:2px; opacity:0.7; }
+    .sp-label { font-family:'Inter',sans-serif; font-size:11px; font-weight:700; width:36px; color:var(--text); }
+    .sp-use { font-size:11px; color:var(--text2); }
+
+    /* shadow */
+    .shadow-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .shadow-box { background:white; border-radius:8px; padding:16px; text-align:center; }
+    .shadow-name { font-size:12px; font-weight:700; margin-bottom:3px; }
+    .shadow-val { font-family:'Inter',sans-serif; font-size:10px; color:var(--text3); line-height:1.5; }
+
+    /* buttons */
+    .btn-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+    .btn { display:inline-flex; align-items:center; gap:5px; border-radius:8px; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; border:none; padding:9px 18px; transition:all 0.15s; }
+    .b-primary { background:var(--accent); color:white; }
+    .b-ghost { background:none; border:1.5px solid var(--border2); color:var(--text2); }
+    .b-sm { padding:6px 12px; font-size:12px; border-radius:6px; }
+    .b-row-btn { padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; font-family:inherit; cursor:pointer; border:1px solid var(--border); background:none; color:var(--text2); }
+    .b-row-primary { padding:5px 12px; border-radius:6px; font-size:11px; font-weight:700; font-family:inherit; cursor:pointer; border:none; background:var(--accent); color:white; }
+
+    /* status pills */
+    .pill-row { display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+    .pill { display:inline-flex; align-items:center; gap:4px; padding:4px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .p-dot { width:5px; height:5px; border-radius:50%; }
+
+    /* tags */
+    .tag-row { display:flex; gap:6px; flex-wrap:wrap; }
+    .tag { padding:3px 9px; border-radius:4px; font-size:11px; }
+    .t-outline { border:1px solid var(--border2); color:var(--text2); }
+    .t-match { border:1px solid rgba(13,148,136,0.3); background:rgba(13,148,136,0.06); color:var(--accent); }
+
+    /* table preview */
+    .table-preview { border-radius:8px; overflow:hidden; border:1px solid var(--border); }
+    .table-preview table { width:100%; border-collapse:collapse; }
+    .table-preview th { text-align:left; padding:9px 14px; font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px; background:#FAFAFA; border-bottom:1px solid var(--border); }
+    .table-preview td { padding:11px 14px; border-bottom:1px solid var(--border); font-size:12px; }
+    .table-preview tr:last-child td { border-bottom:none; }
+
+    /* input */
+    .finput, .fselect { width:100%; padding:9px 12px; background:var(--bg); border:1.5px solid var(--border2); border-radius:8px; font-size:13px; font-family:inherit; color:var(--text); outline:none; }
+    .finput.focus { border-color:var(--accent); background:white; }
+
+    /* candidate card preview */
+    .ccard-preview { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:12px; }
+    .cav { width:40px; height:40px; border-radius:50%; background:var(--navy); display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; color:white; flex-shrink:0; }
+    .cbody { flex:1; }
+    .cname { font-size:13px; font-weight:700; margin-bottom:2px; }
+    .crole { font-size:11px; color:var(--text2); margin-bottom:8px; }
+    .cskills { display:flex; gap:4px; flex-wrap:wrap; margin-bottom:6px; }
+    .cmeta-row { display:flex; gap:12px; }
+    .cmeta { font-size:10px; color:var(--text3); }
+    .cactions { display:flex; flex-direction:column; gap:5px; flex-shrink:0; }
+
+    /* do dont */
+    .do-dont { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .do-box { border:2px solid rgba(13,148,136,0.25); background:rgba(13,148,136,0.03); border-radius:8px; padding:16px; }
+    .dont-box { border:2px solid rgba(239,68,68,0.25); background:rgba(239,68,68,0.03); border-radius:8px; padding:16px; }
+    .do-lbl { font-size:11px; font-weight:700; color:var(--accent); margin-bottom:8px; }
+    .dont-lbl { font-size:11px; font-weight:700; color:#EF4444; margin-bottom:8px; }
+    .rule-text { font-size:12px; color:var(--text2); line-height:1.8; }
+
+    /* diff table */
+    .diff-table { width:100%; border-collapse:collapse; }
+    .diff-table th { text-align:left; padding:8px 12px; font-size:11px; font-weight:700; color:var(--text3); background:#FAFAFA; border-bottom:1px solid var(--border); }
+    .diff-table td { padding:10px 12px; font-size:12px; border-bottom:1px solid var(--border); }
+    .diff-table tr:last-child td { border-bottom:none; }
+    .diff-table .label { font-weight:700; color:var(--text); width:120px; }
+    .chip-seeker { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; background:rgba(255,93,61,0.1); color:#FF5D3D; }
+    .chip-recruiter { display:inline-block; padding:2px 8px; border-radius:4px; font-size:11px; font-weight:700; background:rgba(13,148,136,0.1); color:#0D9488; }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-text">P<span>A</span>RK</div>
+    <div class="logo-sub">RECRUITER</div>
+  </div>
+  <div class="sidebar-label">セクション</div>
+  <div class="sidebar-link active">01 / カラーパレット</div>
+  <div class="sidebar-link">02 / タイポグラフィ</div>
+  <div class="sidebar-link">03 / スペーシング・角丸</div>
+  <div class="sidebar-link">04 / エレベーション</div>
+  <div class="sidebar-link">05 / コンポーネント</div>
+  <div class="sidebar-link">06 / Job-Search との差分</div>
+  <div class="sidebar-link">07 / Do & Don't</div>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title">PARK Recruiter — Design Guidelines</div>
+    <div class="topbar-badge">v1.0 · worker-search</div>
+  </div>
+
+  <div class="wrap">
+    <div class="page-title">
+      <h1>Recruiter <span>Design</span> Guidelines</h1>
+      <p>worker-search（リクルーター向けポータル）のデザイン仕様・コンポーネント一覧</p>
+    </div>
+
+    <!-- 01 COLOR -->
+    <div class="section">
+      <div class="section-title">01 / Color Palette</div>
+
+      <div class="g-card">
+        <div class="c-group">Brand（共通 / PARKロゴ・サイドバー）</div>
+        <div class="color-grid">
+          <div class="color-item">
+            <div class="swatch" style="background:#1A2340;"></div>
+            <div class="c-name">Navy</div><div class="c-hex">#1A2340</div><div class="c-note">サイドバー背景</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#FF5D3D;"></div>
+            <div class="c-name">Brand Orange</div><div class="c-hex">#FF5D3D</div><div class="c-note">ロゴ「A」のみ</div>
+          </div>
+        </div>
+
+        <div class="c-group">Accent（リクルーター側キーカラー）</div>
+        <div class="color-grid">
+          <div class="color-item">
+            <div class="swatch" style="background:#0D9488;"></div>
+            <div class="c-name">Teal</div><div class="c-hex">#0D9488</div><div class="c-note">ボタン・アクティブ・強調</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#0F766E;"></div>
+            <div class="c-name">Teal Dark</div><div class="c-hex">#0F766E</div><div class="c-note">ホバー・プレス時</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:rgba(13,148,136,0.1); border:1px solid #ddd;"></div>
+            <div class="c-name">Teal Light</div><div class="c-hex">rgba(13,148,136,0.10)</div><div class="c-note">選択背景・タグ背景</div>
+          </div>
+        </div>
+
+        <div class="c-group">Neutral</div>
+        <div class="color-grid">
+          <div class="color-item">
+            <div class="swatch" style="background:#F7F8FA; border:1px solid #ddd;"></div>
+            <div class="c-name">Background</div><div class="c-hex">#F7F8FA</div><div class="c-note">ページ背景</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#FFFFFF; border:1px solid #ddd;"></div>
+            <div class="c-name">Surface</div><div class="c-hex">#FFFFFF</div><div class="c-note">カード・テーブル</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#111827;"></div>
+            <div class="c-name">Text</div><div class="c-hex">#111827</div><div class="c-note">本文・見出し</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#6B7280;"></div>
+            <div class="c-name">Text 2</div><div class="c-hex">#6B7280</div><div class="c-note">サブテキスト</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#9CA3AF;"></div>
+            <div class="c-name">Text 3</div><div class="c-hex">#9CA3AF</div><div class="c-note">プレースホルダー</div>
+          </div>
+        </div>
+
+        <div class="c-group">Status（案件ステータス）</div>
+        <div class="color-grid">
+          <div class="color-item">
+            <div class="swatch" style="background:#059669;"></div>
+            <div class="c-name">公開中</div><div class="c-hex">#059669</div><div class="c-note">Active / 公開中</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#D97706;"></div>
+            <div class="c-name">一時停止</div><div class="c-hex">#D97706</div><div class="c-note">Paused</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#EF4444;"></div>
+            <div class="c-name">募集終了</div><div class="c-hex">#EF4444</div><div class="c-note">Closed</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#9CA3AF;"></div>
+            <div class="c-name">下書き</div><div class="c-hex">#9CA3AF</div><div class="c-note">Draft</div>
+          </div>
+        </div>
+
+        <div class="c-group">Status（候補者稼働状況）</div>
+        <div class="color-grid">
+          <div class="color-item">
+            <div class="swatch" style="background:#ECFDF5; border:1px solid #ddd;"></div>
+            <div class="c-name">即日稼働可</div><div class="c-hex">#ECFDF5 / #059669</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#FFF7ED; border:1px solid #ddd;"></div>
+            <div class="c-name">1ヶ月以内</div><div class="c-hex">#FFF7ED / #D97706</div>
+          </div>
+          <div class="color-item">
+            <div class="swatch" style="background:#F9FAFB; border:1px solid #ddd;"></div>
+            <div class="c-name">要相談</div><div class="c-hex">#F9FAFB / #9CA3AF</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 02 TYPOGRAPHY -->
+    <div class="section">
+      <div class="section-title">02 / Typography</div>
+      <div class="g-card">
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Page Title</div><div class="type-spec">Inter 700 / 15px</div></div>
+          <div style="font-family:'Inter',sans-serif; font-size:15px; font-weight:700;">募集管理</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Section Title</div><div class="type-spec">Noto 700 / 13–14px</div></div>
+          <div style="font-size:14px; font-weight:700;">基本情報</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Table Header</div><div class="type-spec">Noto 700 / 10–11px uppercase</div></div>
+          <div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:0.5px;">CASE NAME · STATUS · APPLICANTS</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Table Body</div><div class="type-spec">Noto 400–700 / 12–13px</div></div>
+          <div style="font-size:13px;">UIデザイナー（週3〜、フルリモート可）</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Stat Number</div><div class="type-spec">Inter 800 / 26px</div></div>
+          <div style="font-family:'Inter',sans-serif; font-size:26px; font-weight:800; line-height:1;">14</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Label / Caption</div><div class="type-spec">Noto 700 / 10–11px uppercase</div></div>
+          <div style="font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1px;">稼働日数 · 単価 · 締切</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Sidebar Nav</div><div class="type-spec">Noto 400–500 / 13px</div></div>
+          <div style="font-size:13px; color:var(--text2);">募集管理 · 案件を作成 · 人材を探す</div>
+        </div>
+        <div class="type-row">
+          <div class="type-meta"><div class="type-label">Sidebar Label</div><div class="type-spec">Noto 700 / 9px uppercase</div></div>
+          <div style="font-size:9px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px;">MAIN · COMMUNICATION</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 03 SPACING & RADIUS -->
+    <div class="section">
+      <div class="section-title">03 / Spacing & Border Radius</div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="g-card">
+          <div class="g-card-label">スペーシング</div>
+          <div class="sp-list">
+            <div class="sp-row"><div class="sp-label">4px</div><div class="sp-bar" style="width:4px;"></div><div class="sp-use">ドット・微細余白</div></div>
+            <div class="sp-row"><div class="sp-label">6px</div><div class="sp-bar" style="width:6px;"></div><div class="sp-use">タグ間・バッジ</div></div>
+            <div class="sp-row"><div class="sp-label">8px</div><div class="sp-bar" style="width:8px;"></div><div class="sp-use">ボタン内・チップ</div></div>
+            <div class="sp-row"><div class="sp-label">10px</div><div class="sp-bar" style="width:10px;"></div><div class="sp-use">サイドバーアイテム</div></div>
+            <div class="sp-row"><div class="sp-label">12px</div><div class="sp-bar" style="width:12px;"></div><div class="sp-use">テーブルセル padding</div></div>
+            <div class="sp-row"><div class="sp-label">14px</div><div class="sp-bar" style="width:14px;"></div><div class="sp-use">カード間ギャップ</div></div>
+            <div class="sp-row"><div class="sp-label">16px</div><div class="sp-bar" style="width:16px;"></div><div class="sp-use">カード・フォーム padding</div></div>
+            <div class="sp-row"><div class="sp-label">20px</div><div class="sp-bar" style="width:20px;"></div><div class="sp-use">フォームグループ間</div></div>
+            <div class="sp-row"><div class="sp-label">24px</div><div class="sp-bar" style="width:24px;"></div><div class="sp-use">ページ padding</div></div>
+            <div class="sp-row"><div class="sp-label">28px</div><div class="sp-bar" style="width:28px;"></div><div class="sp-use">topbar・コンテンツ padding</div></div>
+          </div>
+        </div>
+        <div class="g-card">
+          <div class="g-card-label">ボーダーラジウス</div>
+          <div class="radius-row">
+            <div class="ritem"><div class="rbox" style="width:28px;height:28px;border-radius:4px;"></div><div class="r-val">4px</div><div class="r-use">バッジ</div></div>
+            <div class="ritem"><div class="rbox" style="width:32px;height:32px;border-radius:6px;"></div><div class="r-val">6px</div><div class="r-use">行ボタン・タグ</div></div>
+            <div class="ritem"><div class="rbox" style="width:36px;height:36px;border-radius:8px;"></div><div class="r-val">8px</div><div class="r-use">ボタン・入力欄</div></div>
+            <div class="ritem"><div class="rbox" style="width:40px;height:40px;border-radius:10px;"></div><div class="r-val">10px</div><div class="r-use">メインカード・テーブル</div></div>
+            <div class="ritem"><div class="rbox" style="width:44px;height:44px;border-radius:50%;"></div><div class="r-val">50%</div><div class="r-use">アバター</div></div>
+            <div class="ritem"><div class="rbox" style="width:52px;height:20px;border-radius:20px;"></div><div class="r-val">20px</div><div class="r-use">ステータスピル</div></div>
+          </div>
+          <div style="margin-top:16px; padding:12px; background:var(--bg); border-radius:8px; font-size:12px; color:var(--text2); line-height:1.6;">
+            job-search側（14–16px）より小さめ。<br>
+            ビジネスツールらしい引き締まった印象を維持する。
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 04 ELEVATION -->
+    <div class="section">
+      <div class="section-title">04 / Elevation & Shadow</div>
+      <div class="shadow-grid">
+        <div class="shadow-box" style="border:1px solid var(--border); box-shadow:none;">
+          <div class="shadow-name">Flat</div>
+          <div class="shadow-val">border: 1px solid #E5E7EB<br>shadow: none</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;">テーブル・通常カード</div>
+        </div>
+        <div class="shadow-box" style="box-shadow:0 2px 8px rgba(0,0,0,0.05);">
+          <div class="shadow-name">Subtle</div>
+          <div class="shadow-val">0 2px 8px rgba(0,0,0,0.05)</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;">ホバー時</div>
+        </div>
+        <div class="shadow-box" style="box-shadow:0 4px 16px rgba(0,0,0,0.08);">
+          <div class="shadow-name">Raised</div>
+          <div class="shadow-val">0 4px 16px rgba(0,0,0,0.08)</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;">ドロップダウン・モーダル</div>
+        </div>
+        <div class="shadow-box" style="box-shadow:0 0 0 2px rgba(13,148,136,0.25);">
+          <div class="shadow-name">Focus Ring</div>
+          <div class="shadow-val">0 0 0 2px rgba(13,148,136,0.25)</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;">フォーカス状態</div>
+        </div>
+        <div class="shadow-box" style="background:rgba(255,255,255,0.95);backdrop-filter:blur(12px);border:1px solid var(--border);">
+          <div class="shadow-name">Frosted</div>
+          <div class="shadow-val">backdrop-filter: blur(12px)<br>bg: rgba(255,255,255,0.95)</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:6px;">保存バー・固定ヘッダー</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 05 COMPONENTS -->
+    <div class="section">
+      <div class="section-title">05 / Components</div>
+
+      <!-- Buttons -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Button</div>
+        <div class="btn-row">
+          <button class="btn b-primary">公開する</button>
+          <button class="btn b-ghost">下書き保存</button>
+          <button class="btn b-primary b-sm">＋ 案件を作成</button>
+          <button class="btn b-ghost b-sm">CSVエクスポート</button>
+        </div>
+        <div class="btn-row">
+          <button class="b-row-btn">編集</button>
+          <button class="b-row-btn">複製</button>
+          <button class="b-row-primary">応募者を見る</button>
+          <button class="b-row-primary">スカウトを送る</button>
+        </div>
+      </div>
+
+      <!-- Status Pills -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Status Pill（案件）</div>
+        <div class="pill-row">
+          <span class="pill" style="background:#ECFDF5;color:#059669;"><span class="p-dot" style="background:#059669;"></span>公開中</span>
+          <span class="pill" style="background:#FFFBEB;color:#D97706;"><span class="p-dot" style="background:#D97706;"></span>一時停止</span>
+          <span class="pill" style="background:#FEF2F2;color:#EF4444;"><span class="p-dot" style="background:#EF4444;"></span>募集終了</span>
+          <span class="pill" style="background:#F9FAFB;color:#9CA3AF;border:1px solid var(--border);"><span class="p-dot" style="background:#9CA3AF;"></span>下書き</span>
+        </div>
+      </div>
+
+      <!-- Availability Badges -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Availability Badge（候補者）</div>
+        <div class="pill-row">
+          <span style="padding:3px 8px; border-radius:4px; font-size:10px; font-weight:700; background:#ECFDF5; color:#059669;">即日稼働可</span>
+          <span style="padding:3px 8px; border-radius:4px; font-size:10px; font-weight:700; background:#FFF7ED; color:#D97706;">1ヶ月以内</span>
+          <span style="padding:3px 8px; border-radius:4px; font-size:10px; font-weight:700; background:#F9FAFB; color:#9CA3AF; border:1px solid var(--border);">要相談</span>
+        </div>
+      </div>
+
+      <!-- Match Pills -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Match Pill（マッチ度）</div>
+        <div class="pill-row">
+          <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:#ECFDF5;color:#059669;">95% マッチ</span>
+          <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:#FFF7ED;color:#D97706;">74% マッチ</span>
+          <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:#F9FAFB;color:#9CA3AF;">55% マッチ</span>
+        </div>
+      </div>
+
+      <!-- Skill Tags -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Skill Tag</div>
+        <div class="tag-row">
+          <span class="tag t-outline">Figma</span>
+          <span class="tag t-outline">React</span>
+          <span class="tag t-outline">TypeScript</span>
+          <span class="tag t-match">Figma（マッチ）</span>
+          <span class="tag t-match">UI/UX（マッチ）</span>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div class="g-card" style="margin-bottom:10px;">
+        <div class="g-card-label">Table Row（募集管理）</div>
+        <div class="table-preview">
+          <table>
+            <thead><tr><th>案件名</th><th>ステータス</th><th>応募数</th><th>操作</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong style="font-size:13px;">UIデザイナー（週3〜）</strong><br><span style="font-size:11px;color:var(--text3);">デザイン・Figma</span></td>
+                <td><span class="pill" style="background:#ECFDF5;color:#059669;font-size:11px;padding:3px 8px;"><span class="p-dot" style="background:#059669;"></span>公開中</span></td>
+                <td><span style="font-family:'Inter';font-size:14px;font-weight:700;">14</span><span style="font-size:10px;color:var(--text3);display:block;">名が応募</span></td>
+                <td><div style="display:flex;gap:5px;"><button class="b-row-btn">編集</button><button class="b-row-primary">応募者を見る</button></div></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Candidate Card -->
+      <div class="g-card">
+        <div class="g-card-label">Candidate Card（人材検索）</div>
+        <div class="ccard-preview">
+          <div class="cav" style="background:#6D28D9;">田</div>
+          <div class="cbody">
+            <div class="cname">田中 みなみ</div>
+            <div class="crole">UIデザイナー / デザインシステム専門</div>
+            <div class="cskills">
+              <span class="tag t-match">Figma</span>
+              <span class="tag t-match">UI/UX</span>
+              <span class="tag t-outline">React</span>
+              <span class="tag t-outline">Storybook</span>
+            </div>
+            <div class="cmeta-row">
+              <span class="cmeta">📅 経験 5年</span>
+              <span class="cmeta">💰 60〜80万円/月</span>
+              <span class="cmeta">🏠 フルリモート</span>
+            </div>
+          </div>
+          <div class="cactions">
+            <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:#ECFDF5;color:#059669;">即日稼働可</span>
+            <span style="padding:4px 10px;border-radius:6px;font-size:11px;font-weight:700;background:#ECFDF5;color:#059669;">95% マッチ</span>
+            <button class="btn b-primary b-sm" style="margin-top:4px;">スカウトを送る</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 06 DIFF -->
+    <div class="section">
+      <div class="section-title">06 / Job-Search との差分</div>
+      <div class="g-card">
+        <table class="diff-table">
+          <thead><tr><th>要素</th><th>Job-Search（求職者）</th><th>Recruiter（採用担当）</th></tr></thead>
+          <tbody>
+            <tr><td class="label">キーカラー</td><td><span class="chip-seeker">#FF5D3D オレンジ</span></td><td><span class="chip-recruiter">#0D9488 ティール</span></td></tr>
+            <tr><td class="label">背景色</td><td style="color:var(--text2);">#F4F2EF（クリーム）</td><td style="color:var(--text2);">#F7F8FA（ライトグレー）</td></tr>
+            <tr><td class="label">ナビ配置</td><td style="color:var(--text2);">トップバー</td><td style="color:var(--text2);">左サイドバー固定</td></tr>
+            <tr><td class="label">カードの角丸</td><td style="color:var(--text2);">14〜16px（丸め）</td><td style="color:var(--text2);">8〜10px（引き締め）</td></tr>
+            <tr><td class="label">案件表示</td><td style="color:var(--text2);">カードグリッド・マソンリー</td><td style="color:var(--text2);">テーブル一覧</td></tr>
+            <tr><td class="label">グラデーション</td><td style="color:var(--text2);">多用（ヒーロー・サムネ）</td><td style="color:var(--text2);">サムネイルのみ</td></tr>
+            <tr><td class="label">共通ブランド</td><td colspan="2" style="color:var(--text2);">PARK ロゴ・Navy サイドバー・Inter + Noto Sans JP</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 07 DO DONT -->
+    <div class="section">
+      <div class="section-title">07 / Do & Don't</div>
+      <div class="do-dont">
+        <div class="do-box">
+          <div class="do-lbl">✅ DO</div>
+          <div class="rule-text">
+            • キーカラーはティール（#0D9488）のみ使う<br>
+            • 案件一覧はテーブルで表示（一覧性を最優先）<br>
+            • ステータスはピル形式で色分け<br>
+            • サイドバーのナビゲーションを崩さない<br>
+            • 数値はInterフォントで目立たせる<br>
+            • アクション系ボタンは右揃えで統一<br>
+            • フォームの角丸は8px固定
+          </div>
+        </div>
+        <div class="dont-box">
+          <div class="dont-lbl">❌ DON'T</div>
+          <div class="rule-text">
+            • オレンジ（#FF5D3D）を使わない（求職者側の色）<br>
+            • カードを多段グリッドにしない（テーブル優先）<br>
+            • グラデーションをUIに使わない<br>
+            • サイドバーを消してトップナビにしない<br>
+            • 角丸を14px以上にしない（柔らかくなりすぎる）<br>
+            • ステータス色を独自に追加しない<br>
+            • 背景をクリーム（#F4F2EF）にしない
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+</body>
+</html>
