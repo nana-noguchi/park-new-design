@@ -352,6 +352,58 @@
       transition: all 0.25s; pointer-events: none; z-index: 200;
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0 12px;
+        gap: 8px;
+      }
+      .topbar-sep,
+      .topbar-crumb {
+        display: none;
+      }
+      .uname {
+        display: none;
+      }
+
+      .layout {
+        flex-direction: column;
+        padding: 64px 12px 80px;
+        gap: 16px;
+      }
+
+      .aside {
+        width: 100%;
+        position: static;
+      }
+
+      .job-mini {
+        padding: 14px 16px;
+        gap: 12px;
+      }
+      .jm-role {
+        font-size: 14px;
+      }
+
+      .frow {
+        grid-template-columns: 1fr;
+      }
+
+      .radio-cards {
+        grid-template-columns: 1fr;
+      }
+
+      .progress-bar {
+        gap: 0;
+      }
+      .pstep span {
+        display: none;
+      }
+      .pstep.active span {
+        display: inline;
+      }
+    }
   </style>
 </head>
 <body>

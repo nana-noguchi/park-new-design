@@ -147,6 +147,74 @@
     .act-primary:hover { background:#0F766E; }
     .act-ghost { background:none; border:1px solid var(--border2); color:var(--text2); }
     .act-ghost:hover { border-color:var(--accent); color:var(--accent); }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar {
+        padding: 0 16px;
+        gap: 8px;
+      }
+      .topbar-btn.btn-ghost {
+        display: none;
+      }
+
+      .search-bar {
+        padding: 10px 16px;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .search-field {
+        width: 100%;
+      }
+      .search-btn {
+        width: 100%;
+        justify-content: center;
+      }
+
+      .body-wrap {
+        flex-direction: column;
+        overflow: visible;
+      }
+
+      .filter-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+        display: none;
+      }
+
+      .results {
+        overflow-y: visible;
+        padding: 12px 16px;
+      }
+
+      .ccard {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .ccard-actions {
+        flex-direction: row;
+        margin-left: 0;
+        width: 100%;
+        justify-content: flex-end;
+      }
+      .ccard-right {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+    }
   </style>
 </head>
 <body>

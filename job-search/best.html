@@ -546,6 +546,70 @@
     ::-webkit-scrollbar { width: 6px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0 12px;
+        gap: 10px;
+      }
+      .topbar-search {
+        max-width: none;
+        flex: 1;
+      }
+      .topbar-search .kbd {
+        display: none;
+      }
+      .topbar-nav .tnav:not(.active) {
+        display: none;
+      }
+      .topbar-nav .tnav.active {
+        display: flex;
+      }
+      .uname {
+        display: none;
+      }
+
+      .layout {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        padding: 16px 12px 60px;
+      }
+
+      .hero-strip {
+        padding: 20px 18px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 16px;
+      }
+      .hero-title {
+        font-size: 18px;
+      }
+      .hero-stats {
+        gap: 16px;
+      }
+
+      .feed.grid-mode {
+        grid-template-columns: 1fr;
+      }
+
+      .jcard {
+        flex-direction: column;
+      }
+      .jcard-thumb {
+        width: 100%;
+        height: 100px;
+      }
+      .jcard-actions {
+        flex-wrap: wrap;
+      }
+    }
   </style>
 </head>
 <body>

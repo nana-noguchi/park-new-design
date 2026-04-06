@@ -217,6 +217,76 @@
       transition:all 0.15s;
     }
     .chat-btn:hover { border-color:var(--navy); color:var(--navy); }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+      .topbar {
+        padding: 0 12px;
+        gap: 10px;
+        flex-wrap: wrap;
+        height: auto;
+        min-height: 52px;
+      }
+      .crumb {
+        display: none;
+      }
+      .topbar-right {
+        gap: 6px;
+      }
+      .tnav {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+      .uname {
+        display: none;
+      }
+
+      .layout {
+        flex-direction: column;
+        padding: 64px 12px 80px;
+        gap: 16px;
+      }
+
+      .hero {
+        padding: 20px 18px;
+      }
+      .hero-top {
+        flex-direction: column;
+        gap: 12px;
+      }
+      .hero-role {
+        font-size: 18px;
+      }
+      .hero-actions {
+        align-self: flex-start;
+      }
+
+      .conditions {
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+      }
+
+      .company-stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .aside {
+        width: 100%;
+        position: static;
+      }
+
+      .process {
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .proc-step {
+        flex: 0 0 auto;
+        min-width: 60px;
+      }
+      .proc-line {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>

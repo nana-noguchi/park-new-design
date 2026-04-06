@@ -163,6 +163,58 @@
     .row-btn.primary { background:var(--accent); border-color:var(--accent); color:white; }
 
     .empty-row td { text-align:center; padding:40px; color:var(--text3); }
+
+    /* ── Mobile Responsive ── */
+    @media (max-width: 768px) {
+      body {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .main {
+        margin-left: 0;
+      }
+
+      .topbar {
+        padding: 0 16px;
+        gap: 8px;
+      }
+
+      .content {
+        padding: 16px;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .filter-bar {
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .filter-sep {
+        display: none;
+      }
+      .search-input {
+        width: 100%;
+        order: -1;
+      }
+      .search-input input {
+        width: 100%;
+      }
+
+      .table-wrap {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      table {
+        min-width: 600px;
+      }
+    }
   </style>
 </head>
 <body>
